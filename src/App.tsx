@@ -7,6 +7,7 @@ import CRTOverlay from './components/background/CRTOverlay'
 import SoundToggle from './components/ui/SoundToggle'
 import BootSequence from './components/stages/BootSequence'
 import OperatorScan from './components/stages/OperatorScan'
+import WelcomeHail from './components/stages/WelcomeHail'
 import Terminal from './components/stages/Terminal'
 import AccessChain from './components/stages/AccessChain'
 import PriceReveal from './components/stages/PriceReveal'
@@ -25,6 +26,7 @@ export default function App() {
   const [stage, setStage] = useState<Stage>('boot')
   const [engine, setEngine] = useState<Engine>(targetEngine)
   const [coin, setCoin] = useState<CryptoAsset | null>(null)
+  const [welcomed, setWelcomed] = useState(false)
 
   // Pause the heavy background canvases during full-screen cinematic stages
   // that already carry their own motion (keeps mobile framerate healthy).
@@ -128,6 +130,13 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* One-time robotic voice hail on first terminal entry */}
+      <AnimatePresence>
+        {stage === 'terminal' && !welcomed && (
+          <WelcomeHail key="hail" onDone={() => setWelcomed(true)} />
+        )}
+      </AnimatePresence>
     </>
   )
 }

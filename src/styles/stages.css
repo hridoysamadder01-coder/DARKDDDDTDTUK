@@ -1022,3 +1022,84 @@
   .opscan-frame { width: 88vw; }
   .opscan-log { width: 88vw; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   WELCOME HAIL · robotic voice transmission overlay
+   ───────────────────────────────────────────────────────────── */
+.hail {
+  position: fixed; inset: 0; z-index: 90;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at center, rgba(4, 9, 7, 0.86), rgba(1, 3, 2, 0.96));
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+}
+.hail-inner {
+  width: min(640px, 92vw);
+  border: 1px solid var(--line-strong);
+  background: rgba(6, 12, 10, 0.6);
+  box-shadow: var(--shadow-glow), inset 0 0 60px rgba(0, 0, 0, 0.55);
+  padding: 26px 26px 20px;
+  cursor: default;
+  text-align: center;
+}
+.hail-head {
+  font-size: 10.5px; letter-spacing: 0.24em; color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  margin-bottom: 20px;
+}
+.hail-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--amber); box-shadow: 0 0 10px var(--amber-glow);
+  animation: hail-blink 1s ease-in-out infinite;
+}
+@keyframes hail-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+/* waveform */
+.hail-wave {
+  display: flex; align-items: center; justify-content: center;
+  gap: 3px; height: 46px; margin-bottom: 22px;
+}
+.hail-wave span {
+  width: 3px; height: 10%;
+  background: linear-gradient(180deg, var(--green), var(--green-dim));
+  box-shadow: 0 0 8px var(--green-glow);
+  animation: hail-bar 0.9s ease-in-out infinite;
+}
+.hail-wave[data-live='false'] span { animation-play-state: paused; opacity: 0.25; }
+@keyframes hail-bar {
+  0%, 100% { height: 12%; opacity: 0.55; }
+  50% { height: 92%; opacity: 1; }
+}
+
+.hail-lines {
+  min-height: 96px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px;
+}
+.hail-line {
+  font-size: clamp(13px, 2.4vw, 16px);
+  letter-spacing: 0.12em; color: var(--text);
+  line-height: 1.5;
+}
+.hail-line.active { color: var(--green); text-shadow: 0 0 14px var(--green-glow); }
+
+.hail-name {
+  margin-top: 16px;
+}
+.hail-name .glitch {
+  font-size: clamp(24px, 6vw, 40px);
+  font-weight: 800; letter-spacing: 0.14em; color: var(--green);
+  text-shadow: 0 0 26px var(--green-glow);
+}
+
+.hail-foot {
+  margin-top: 22px;
+  display: flex; gap: 12px; align-items: center; justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .hail-inner { padding: 20px 16px 16px; }
+  .hail-lines { min-height: 108px; }
+}

@@ -42,6 +42,13 @@ export interface AppConfig {
 
   /** Neutral notice shown only inside the financial (access) screen. */
   financialNotice: string
+
+  /** Robotic "voice hail" shown once on entering the terminal. */
+  welcome: {
+    lines: string[]
+    /** The name spoken/shown once more at the very end. */
+    outro: string
+  }
 }
 
 export const config: AppConfig = {
@@ -63,6 +70,15 @@ export const config: AppConfig = {
   bilingualLabels: true,
 
   financialNotice: 'NO REAL TRANSACTIONS',
+
+  welcome: {
+    lines: [
+      'WELCOME MISTER H S JACK-SPARROW',
+      'LONG TIME TO SEE YOU',
+      'HERE IS THE MOST POWERFUL AND UPDATED ENGINE FOR YOU',
+    ],
+    outro: 'JACK-SPARROW',
+  },
 }
 
 /** Small Chinese metadata micro-labels (used sparingly for flavour). */
