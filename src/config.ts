@@ -48,6 +48,14 @@ export interface AppConfig {
     lines: string[]
     /** The name spoken/shown once more at the very end. */
     outro: string
+    /** Speech tuning — lower pitch = deeper, lower rate = slower. */
+    voice: { rate: number; pitch: number }
+    /** Spoken briefing of the primary target build. */
+    briefing: {
+      heading: string
+      title: string
+      lines: string[]
+    }
   }
 }
 
@@ -78,6 +86,19 @@ export const config: AppConfig = {
       'HERE IS THE MOST POWERFUL AND UPDATED ENGINE FOR YOU',
     ],
     outro: 'JACK-SPARROW',
+    // Deep and slow — a calm, heavy machine voice.
+    voice: { rate: 0.62, pitch: 0.28 },
+    briefing: {
+      heading: 'PRIMARY TARGET BUILD',
+      title: 'OBSIDIAN CORE X',
+      lines: [
+        'BEHOLD OBSIDIAN CORE X — THE UNIVERSAL NATIVE BUILD',
+        'A CROSS-MODEL VISION CORE, COMPILED FOR DIRECT ON-DEVICE EXECUTION',
+        'IT RUNS NATIVELY ON ANDROID AND IPHONE — NO CLOUD, NO LIMITS',
+        'LOW-LATENCY PROCESSING, SEALED UNDER OMEGA CLEARANCE, LIFETIME ACCESS',
+        'THE MOST POWERFUL ENGINE IN THE INDEX — RESERVED FOR YOU',
+      ],
+    },
   },
 }
 
