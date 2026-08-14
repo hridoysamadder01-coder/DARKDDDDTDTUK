@@ -11,6 +11,7 @@ import AccessChain from './components/stages/AccessChain'
 import PriceReveal from './components/stages/PriceReveal'
 import CryptoSession from './components/stages/CryptoSession'
 import FinalReveal from './components/stages/FinalReveal'
+import CodeStream from './components/stages/CodeStream'
 
 const fade = {
   initial: { opacity: 0 },
@@ -26,7 +27,8 @@ export default function App() {
 
   // Pause the heavy background canvases during full-screen cinematic stages
   // that already carry their own motion (keeps mobile framerate healthy).
-  const heavyBgPaused = stage === 'accessChain' || stage === 'final'
+  const heavyBgPaused =
+    stage === 'accessChain' || stage === 'final' || stage === 'codestream'
 
   const goTerminal = useCallback(() => setStage('terminal'), [])
   const initiate = useCallback((e: Engine) => {
@@ -44,8 +46,8 @@ export default function App() {
       <Background paused={heavyBgPaused} />
       <CRTOverlay />
 
-      {/* Persistent chrome */}
-      <SoundToggle />
+      {/* Persistent chrome (the code-stream screen has its own top bar) */}
+      {stage !== 'codestream' && <SoundToggle />}
       {stage === 'boot' && (
         <button className="skip-btn" onClick={goTerminal}>
           SKIP ▸
@@ -97,7 +99,20 @@ export default function App() {
 
           {stage === 'final' && (
             <motion.div key="final" {...fade}>
-              <FinalReveal engine={engine} onRestart={restart} />
+              <FinalReveal
+                engine={engine}
+                onRestart={restart}
+                onWrite={() => {
+                  window.scrollTo({ top: 0 })
+                  setStage('codestream')
+                }}
+              />
+            </motion.div>
+          )}
+
+          {stage === 'codestream' && (
+            <motion.div key="codestream" {...fade}>
+              <CodeStream onExit={restart} />
             </motion.div>
           )}
         </AnimatePresence>

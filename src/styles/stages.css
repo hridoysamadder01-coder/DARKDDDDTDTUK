@@ -673,3 +673,85 @@
 .mt24 { margin-top: 24px; }
 .row-center { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
 .faded { opacity: 0.6; }
+
+/* ===================== CODE STREAM (WRITE BUILD) ===================== */
+.codestream {
+  position: relative;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  height: 100dvh;
+  background: linear-gradient(180deg, rgba(4, 7, 10, 0.92), rgba(4, 7, 10, 0.86));
+  font-family: var(--font-mono);
+}
+.cs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.4);
+  flex-wrap: wrap;
+}
+.cs-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cs-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green-glow); flex: none; animation: pulseDot 1.4s ease-in-out infinite; }
+@keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.cs-title { font-size: 12px; letter-spacing: 0.18em; color: var(--green); font-weight: 700; flex: none; }
+.cs-file { font-size: 12px; color: var(--text-dim); letter-spacing: 0.04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.cs-stat { font-size: 11px; letter-spacing: 0.1em; color: var(--text-dim); white-space: nowrap; }
+.cs-stat b { color: var(--text); font-weight: 600; }
+.cs-stop {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--red);
+  border: 1px solid var(--red-glow);
+  padding: 6px 12px;
+  border-radius: 3px;
+  background: rgba(214, 67, 79, 0.06);
+  transition: all 0.16s ease;
+}
+.cs-stop:hover { background: var(--red); color: #14060a; }
+
+.cs-bar { height: 2px; background: rgba(69, 207, 146, 0.08); overflow: hidden; }
+.cs-fill { height: 100%; background: linear-gradient(90deg, var(--green-deep), var(--green)); transition: width 0.15s linear; }
+
+.cs-body {
+  flex: 1;
+  overflow: hidden;
+  padding: 14px 16px 8px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text);
+  mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 100%);
+}
+@media (max-width: 640px) { .cs-body { font-size: 11px; padding: 10px 10px 6px; } }
+.cs-line { display: flex; gap: 12px; white-space: pre; }
+.cs-line code { font-family: var(--font-mono); white-space: pre-wrap; word-break: break-word; }
+.cs-ln { color: var(--green-deep); flex: none; user-select: none; font-size: 11px; padding-top: 1px; min-width: 2.4em; text-align: right; }
+.cs-active code { color: var(--text); }
+.cs-caret { display: inline-block; width: 7px; height: 1em; margin-left: 1px; background: var(--green); vertical-align: text-bottom; opacity: 0.85; animation: blink 1.1s steps(1) infinite; }
+
+/* syntax tones (graded) */
+.cs-body .c-kw { color: var(--green); }
+.cs-body .c-str { color: var(--amber); }
+.cs-body .c-num { color: #6fd3c0; }
+.cs-body .c-com { color: var(--text-dim); opacity: 0.8; }
+.cs-body .c-log { color: #6fd3c0; }
+.cs-body .c-warn { color: var(--amber); }
+
+.cs-foot {
+  padding: 8px 16px;
+  border-top: 1px solid var(--line);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

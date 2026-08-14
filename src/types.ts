@@ -5,6 +5,7 @@ export type Stage =
   | 'priceReveal'
   | 'cryptoSession'
   | 'final'
+  | 'codestream'
 
 export type EngineStatus =
   | 'AVAILABLE // LIFETIME ACCESS'

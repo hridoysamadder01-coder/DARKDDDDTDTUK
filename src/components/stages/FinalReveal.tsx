@@ -13,6 +13,10 @@ type Phase = 'granted' | 'decrypt' | 'ready'
 const FINAL_LINES = [
   'DECRYPTING CORE',
   'VERIFYING MODULES',
+  'LINKING VISION STACK',
+  'COMPILING NATIVE RUNTIME',
+  'OPTIMIZING PIPELINE',
+  'MAPPING DEVICE TARGETS',
   'INITIALIZING RUNTIME',
   'FINALIZING PACKAGE',
 ]
@@ -20,9 +24,11 @@ const FINAL_LINES = [
 export default function FinalReveal({
   engine,
   onRestart,
+  onWrite,
 }: {
   engine: Engine
   onRestart: () => void
+  onWrite: () => void
 }) {
   const { play } = useSound()
   const parts = useMemo(() => engine.name.split('//').map((s) => s.trim()), [engine.name])
@@ -76,7 +82,7 @@ export default function FinalReveal({
           <small>{subtitle}</small>
         </div>
         <div className="status">
-          PACKAGE STATUS: {phase === 'ready' ? 'READY · RUNTIME ONLINE' : 'READY'}
+          PACKAGE STATUS: {phase === 'ready' ? 'READY · TAP TO WRITE BUILD' : 'READY'}
         </div>
 
         {phase !== 'granted' && (
@@ -96,11 +102,15 @@ export default function FinalReveal({
 
         {phase === 'ready' && (
           <motion.div
-            className="mt24"
+            className="mt24 row-center"
+            style={{ gap: 12, flexWrap: 'wrap' }}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
+            <button className="btn primary" onClick={onWrite}>
+              ▶ WRITE BUILD TO DEVICE
+            </button>
             <button className="btn ghost" onClick={onRestart}>
               ◂ RETURN TO DIRECTORY
             </button>
