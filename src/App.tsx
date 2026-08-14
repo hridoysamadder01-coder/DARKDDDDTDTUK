@@ -6,6 +6,7 @@ import { Background } from './components/background/Background'
 import CRTOverlay from './components/background/CRTOverlay'
 import SoundToggle from './components/ui/SoundToggle'
 import BootSequence from './components/stages/BootSequence'
+import OperatorScan from './components/stages/OperatorScan'
 import Terminal from './components/stages/Terminal'
 import AccessChain from './components/stages/AccessChain'
 import PriceReveal from './components/stages/PriceReveal'
@@ -31,6 +32,10 @@ export default function App() {
     stage === 'accessChain' || stage === 'final' || stage === 'codestream'
 
   const goTerminal = useCallback(() => setStage('terminal'), [])
+  const goCamera = useCallback(() => {
+    window.scrollTo({ top: 0 })
+    setStage('cameraVerify')
+  }, [])
   const initiate = useCallback((e: Engine) => {
     setEngine(e)
     window.scrollTo({ top: 0 })
@@ -48,7 +53,7 @@ export default function App() {
 
       {/* Persistent chrome (the code-stream screen has its own top bar) */}
       {stage !== 'codestream' && <SoundToggle />}
-      {stage === 'boot' && (
+      {(stage === 'boot' || stage === 'cameraVerify') && (
         <button className="skip-btn" onClick={goTerminal}>
           SKIP ▸
         </button>
@@ -58,7 +63,13 @@ export default function App() {
         <AnimatePresence mode="wait">
           {stage === 'boot' && (
             <motion.div key="boot" {...fade}>
-              <BootSequence onDone={goTerminal} />
+              <BootSequence onDone={goCamera} />
+            </motion.div>
+          )}
+
+          {stage === 'cameraVerify' && (
+            <motion.div key="camera" {...fade}>
+              <OperatorScan onDone={goTerminal} />
             </motion.div>
           )}
 

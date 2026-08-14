@@ -1,5 +1,6 @@
 export type Stage =
   | 'boot'
+  | 'cameraVerify'
   | 'terminal'
   | 'accessChain'
   | 'priceReveal'
