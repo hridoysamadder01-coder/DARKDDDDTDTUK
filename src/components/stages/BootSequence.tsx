@@ -15,8 +15,12 @@ interface Check {
 const CHECKS: Check[] = [
   { label: 'BOOT SECTOR', value: 'OK', kind: 'ok' },
   { label: 'MEMORY INTEGRITY', value: 'OK', kind: 'ok' },
+  { label: 'PROXY CHAIN', value: 'ROUTED', kind: 'ok' },
+  { label: 'MAC ADDRESS', value: 'SPOOFED', kind: 'ok' },
   { label: 'PRIVATE NODE', value: 'FOUND', kind: 'ok' },
   { label: 'SECURE CHANNEL', value: 'ESTABLISHED', kind: 'ok' },
+  { label: 'ACCESS TOKEN', value: 'INJECTED', kind: 'ok' },
+  { label: 'GATE BYPASS', value: 'CLEARED', kind: 'ok' },
   { label: 'ENGINE INDEX', value: 'LOADED', kind: 'ok' },
   { label: 'ACCESS CLASS', value: 'RESTRICTED', kind: 'warn' },
 ]

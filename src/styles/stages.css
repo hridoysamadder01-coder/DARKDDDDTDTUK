@@ -804,3 +804,32 @@
 .paylink-btn:disabled { opacity: 0.55; pointer-events: none; }
 .paylink-msg { margin-top: 7px; font-size: 10px; letter-spacing: 0.06em; color: var(--text-dim); }
 .paylink-msg.busy { color: var(--amber); }
+
+/* ===================== LIVE FEED (intercept console) ===================== */
+.livefeed { margin: 6px 0 10px; padding: 0; overflow: hidden; }
+.lf-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-bottom: 1px solid var(--line);
+  font-size: 10.5px; letter-spacing: 0.18em; color: var(--text-dim); text-transform: uppercase;
+}
+.lf-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green-glow); animation: pulseDot 1.5s ease-in-out infinite; }
+.lf-h-right { margin-left: auto; color: var(--green-dim); letter-spacing: 0.12em; }
+.lf-body {
+  height: 150px; overflow: hidden; padding: 8px 12px;
+  font-size: 11.5px; line-height: 1.6; color: var(--text-dim);
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 100%);
+}
+@media (max-width: 640px) { .lf-body { height: 116px; font-size: 10.5px; } }
+.lf-line { display: flex; gap: 8px; white-space: pre-wrap; word-break: break-word; }
+.lf-tick { color: var(--green-deep); flex: none; }
+.lf-line.ok { color: var(--text); }
+.lf-line.in { color: var(--green); }
+.lf-line.warn { color: var(--amber); }
+.lf-line.err { color: var(--red); }
+.lf-prompt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-top: 1px solid var(--line);
+  font-size: 12px; background: rgba(0, 0, 0, 0.25);
+}
+.lf-ps { color: var(--green); flex: none; }
+.lf-cmd { color: var(--text); white-space: pre; }

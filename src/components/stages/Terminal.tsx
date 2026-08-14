@@ -3,7 +3,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import type { Engine } from '../../types'
 import { engines } from '../../data/engines'
 import { config, zh } from '../../config'
+import { pushFeed } from '../../lib/feed'
+import { hex } from '../../lib/random'
 import Hud from './Hud'
+import LiveFeed from './LiveFeed'
 import EngineCard from './EngineCard'
 import DetailModal from './DetailModal'
 import GlitchText from '../ui/GlitchText'
@@ -12,12 +15,21 @@ interface Props {
   onInitiate: (e: Engine) => void
 }
 
+const short = (e: Engine) => e.name.split('//')[0].trim()
+
 export default function Terminal({ onInitiate }: Props) {
   const [detail, setDetail] = useState<Engine | null>(null)
 
-  // Feature the target build first (hero), then the rest of the catalog.
   const target = engines.find((e) => e.isTarget)!
   const others = engines.filter((e) => !e.isTarget)
+
+  // Every open prints intercept traffic — click → text.
+  const openDetail = (e: Engine) => {
+    pushFeed(`» query ${short(e)}`, 'in')
+    pushFeed(`» pull manifest 0x${hex(6)}`, 'dim')
+    pushFeed(`» decrypt package :: ok`, 'ok')
+    setDetail(e)
+  }
 
   return (
     <motion.div
@@ -40,15 +52,17 @@ export default function Terminal({ onInitiate }: Props) {
         </div>
       </div>
 
+      <LiveFeed />
+
       <div className="section-label">FEATURED // PRIMARY TARGET BUILD</div>
       <div className="grid">
-        <EngineCard key={target.id} engine={target} onOpen={setDetail} />
+        <EngineCard key={target.id} engine={target} onOpen={openDetail} />
       </div>
 
       <div className="section-label">ENGINE // BUILD MARKETPLACE · {engines.length} BUILDS INDEXED</div>
       <div className="grid">
         {others.map((e) => (
-          <EngineCard key={e.id} engine={e} onOpen={setDetail} />
+          <EngineCard key={e.id} engine={e} onOpen={openDetail} />
         ))}
       </div>
 
@@ -60,6 +74,8 @@ export default function Terminal({ onInitiate }: Props) {
             engine={detail}
             onClose={() => setDetail(null)}
             onInitiate={(e) => {
+              pushFeed(`» INITIATE ACCESS CHAIN :: ${short(e)}`, 'in')
+              pushFeed(`» requesting private node 0x${hex(6)}`, 'warn')
               setDetail(null)
               onInitiate(e)
             }}
