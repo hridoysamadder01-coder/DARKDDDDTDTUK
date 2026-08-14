@@ -74,12 +74,12 @@ export default function CodeRain({ paused = false }: { paused?: boolean }) {
         // leading char brighter
         const lead = Math.random() > 0.965
         if (lead) {
-          ctx.fillStyle = 'rgba(200, 255, 230, 0.95)'
-          ctx.shadowColor = 'rgba(0,255,156,0.9)'
-          ctx.shadowBlur = 10
+          ctx.fillStyle = 'rgba(150, 205, 182, 0.7)'
+          ctx.shadowColor = 'rgba(69,207,146,0.45)'
+          ctx.shadowBlur = 4
         } else {
           const shade = 0.28 + Math.random() * 0.5
-          ctx.fillStyle = `rgba(0, 255, 156, ${shade})`
+          ctx.fillStyle = `rgba(69, 207, 146, ${shade})`
           ctx.shadowBlur = 0
         }
         ctx.fillText(ch, x, y)
@@ -109,5 +109,5 @@ export default function CodeRain({ paused = false }: { paused?: boolean }) {
     }
   }, [paused])
 
-  return <canvas ref={canvasRef} className="bg-canvas" style={{ opacity: 0.5 }} aria-hidden />
+  return <canvas ref={canvasRef} className="bg-canvas" style={{ opacity: 0.3 }} aria-hidden />
 }

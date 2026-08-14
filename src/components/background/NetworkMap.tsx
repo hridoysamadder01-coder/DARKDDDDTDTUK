@@ -107,7 +107,7 @@ export default function NetworkMap({ paused = false }: { paused?: boolean }) {
           const d = Math.hypot(dx, dy)
           if (d < maxDist) {
             const alpha = (1 - d / maxDist) * 0.22
-            ctx.strokeStyle = `rgba(0, 255, 156, ${alpha})`
+            ctx.strokeStyle = `rgba(69, 207, 146, ${alpha})`
             ctx.lineWidth = 1
             ctx.beginPath()
             ctx.moveTo(a.x, a.y)
@@ -123,8 +123,8 @@ export default function NetworkMap({ paused = false }: { paused?: boolean }) {
         const r = 1.6 + (Math.sin(n.pulse) + 1) * 1.6
         const glow = 0.35 + (Math.sin(n.pulse) + 1) * 0.28
         ctx.beginPath()
-        ctx.fillStyle = `rgba(0, 255, 156, ${glow})`
-        ctx.shadowColor = 'rgba(0,255,156,0.8)'
+        ctx.fillStyle = `rgba(69, 207, 146, ${glow})`
+        ctx.shadowColor = 'rgba(69,207,146,0.8)'
         ctx.shadowBlur = 8
         ctx.arc(n.x, n.y, r, 0, Math.PI * 2)
         ctx.fill()
@@ -152,5 +152,5 @@ export default function NetworkMap({ paused = false }: { paused?: boolean }) {
     }
   }, [paused])
 
-  return <canvas ref={canvasRef} className="bg-canvas" style={{ opacity: 0.65 }} aria-hidden />
+  return <canvas ref={canvasRef} className="bg-canvas" style={{ opacity: 0.4 }} aria-hidden />
 }
