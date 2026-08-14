@@ -1,20 +1,27 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import type { PaymentChannel } from '../../types'
+import type { CryptoAsset, Engine } from '../../types'
 import { config } from '../../config'
+import { makeLadder } from '../../lib/price'
 import { useSound } from '../../hooks/useSoundToggle'
 import GlitchText from '../ui/GlitchText'
-import PaymentSelect from './PaymentSelect'
+import CryptoSelect from './CryptoSelect'
 
 type Phase = 'calc' | 'ladder' | 'final'
 
-export default function PriceReveal({ onSelect }: { onSelect: (c: PaymentChannel) => void }) {
+interface Props {
+  engine: Engine
+  onSelect: (c: CryptoAsset) => void
+}
+
+export default function PriceReveal({ engine, onSelect }: Props) {
   const { play } = useSound()
   const [phase, setPhase] = useState<Phase>('calc')
   const [display, setDisplay] = useState<number | null>(null)
   const timers = useRef<number[]>([])
 
-  const ladder = useMemo(() => config.priceLadder, [])
+  const ladder = useMemo(() => makeLadder(engine.price), [engine.price])
+  const shortName = useMemo(() => engine.name.split('//')[0].trim(), [engine.name])
 
   useEffect(() => {
     const push = (fn: () => void, ms: number) => {
@@ -22,10 +29,8 @@ export default function PriceReveal({ onSelect }: { onSelect: (c: PaymentChannel
       timers.current.push(id)
     }
 
-    // Phase 1: calculating
     push(() => setPhase('ladder'), 1500)
 
-    // Phase 2: ladder of numbers
     let acc = 1500
     ladder.forEach((n, i) => {
       acc += 260 + i * 30
@@ -35,10 +40,9 @@ export default function PriceReveal({ onSelect }: { onSelect: (c: PaymentChannel
       }, acc)
     })
 
-    // Phase 3: land on final price
     acc += 520
     push(() => {
-      setDisplay(config.price)
+      setDisplay(engine.price)
       setPhase('final')
       play('confirm')
     }, acc)
@@ -67,7 +71,7 @@ export default function PriceReveal({ onSelect }: { onSelect: (c: PaymentChannel
         {phase !== 'calc' && (
           <>
             <div className="calc faded" style={{ marginBottom: 4 }}>
-              OBSIDIAN CORE X // PRIVATE ACCESS COST
+              {shortName} // PRIVATE ACCESS COST
             </div>
             <AnimatePresence mode="popLayout">
               <motion.div
@@ -78,7 +82,7 @@ export default function PriceReveal({ onSelect }: { onSelect: (c: PaymentChannel
                 transition={{ duration: phase === 'final' ? 0.4 : 0.12 }}
               >
                 {phase === 'final' ? (
-                  <GlitchText text={`$${config.price} ${config.currency}`} always intensity={0.3} />
+                  <GlitchText text={`$${engine.price} ${config.currency}`} always intensity={0.3} />
                 ) : (
                   `$${display}`
                 )}
@@ -92,13 +96,13 @@ export default function PriceReveal({ onSelect }: { onSelect: (c: PaymentChannel
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.25 }}
               >
-                ONE-TIME PRIVATE ACCESS
+                {config.accessLabel}
               </motion.div>
             )}
           </>
         )}
 
-        {phase === 'final' && <PaymentSelect onSelect={onSelect} />}
+        {phase === 'final' && <CryptoSelect onSelect={onSelect} />}
       </div>
     </div>
   )

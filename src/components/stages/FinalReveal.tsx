@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import type { Engine } from '../../types'
 import { useSequence, type SequenceStep } from '../../hooks/useSequence'
 import { useSound } from '../../hooks/useSoundToggle'
 import { config } from '../../config'
@@ -16,8 +17,17 @@ const FINAL_LINES = [
   'INITIALIZATION COMPLETE',
 ]
 
-export default function FinalReveal({ onRestart }: { onRestart: () => void }) {
+export default function FinalReveal({
+  engine,
+  onRestart,
+}: {
+  engine: Engine
+  onRestart: () => void
+}) {
   const { play } = useSound()
+  const parts = useMemo(() => engine.name.split('//').map((s) => s.trim()), [engine.name])
+  const codename = parts[0] || config.targetCodename
+  const subtitle = parts[1] || 'UNIVERSAL NATIVE BUILD'
   const [phase, setPhase] = useState<Phase>('granted')
   const [pct, setPct] = useState(0)
   const [logs, setLogs] = useState<LogLine[]>([])
@@ -65,10 +75,10 @@ export default function FinalReveal({ onRestart }: { onRestart: () => void }) {
           >
             <GlitchText as="div" className="granted" text="ACCESS GRANTED" always intensity={0.2} />
             <div className="prod">
-              {config.targetCodename}
-              <small>UNIVERSAL NATIVE BUILD</small>
+              {codename}
+              <small>{subtitle}</small>
             </div>
-            <div className="status">PACKAGE STATUS: READY</div>
+            <div className="status">PACKAGE STATUS: READY · {config.accessLabel}</div>
 
             {phase === 'decrypt' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt24">

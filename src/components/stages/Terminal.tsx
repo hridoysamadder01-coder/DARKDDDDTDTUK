@@ -9,17 +9,15 @@ import DetailModal from './DetailModal'
 import GlitchText from '../ui/GlitchText'
 
 interface Props {
-  onTarget: (e: Engine) => void
+  onInitiate: (e: Engine) => void
 }
 
-export default function Terminal({ onTarget }: Props) {
+export default function Terminal({ onInitiate }: Props) {
   const [detail, setDetail] = useState<Engine | null>(null)
 
-  // Order: keep the target build featured near the top of the directory.
+  // Feature the target build first (hero), then the rest of the catalog.
   const target = engines.find((e) => e.isTarget)!
   const others = engines.filter((e) => !e.isTarget)
-  const beforeTarget = others.slice(0, 4)
-  const afterTarget = others.slice(4)
 
   return (
     <motion.div
@@ -42,22 +40,31 @@ export default function Terminal({ onTarget }: Props) {
         </div>
       </div>
 
-      <div className="section-label">ENGINE // BUILD DIRECTORY</div>
-
+      <div className="section-label">FEATURED // PRIMARY TARGET BUILD</div>
       <div className="grid">
-        {beforeTarget.map((e) => (
-          <EngineCard key={e.id} engine={e} onOpen={setDetail} onTarget={onTarget} />
-        ))}
-        <EngineCard key={target.id} engine={target} onOpen={setDetail} onTarget={onTarget} />
-        {afterTarget.map((e) => (
-          <EngineCard key={e.id} engine={e} onOpen={setDetail} onTarget={onTarget} />
+        <EngineCard key={target.id} engine={target} onOpen={setDetail} />
+      </div>
+
+      <div className="section-label">ENGINE // BUILD MARKETPLACE · {engines.length} BUILDS INDEXED</div>
+      <div className="grid">
+        {others.map((e) => (
+          <EngineCard key={e.id} engine={e} onOpen={setDetail} />
         ))}
       </div>
 
-      <div className="section-label">END OF DIRECTORY // {engines.length} BUILDS INDEXED</div>
+      <div className="section-label">END OF DIRECTORY // SIMULATION CATALOG</div>
 
       <AnimatePresence>
-        {detail && <DetailModal engine={detail} onClose={() => setDetail(null)} />}
+        {detail && (
+          <DetailModal
+            engine={detail}
+            onClose={() => setDetail(null)}
+            onInitiate={(e) => {
+              setDetail(null)
+              onInitiate(e)
+            }}
+          />
+        )}
       </AnimatePresence>
     </motion.div>
   )

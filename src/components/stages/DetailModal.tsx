@@ -1,16 +1,18 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import type { Engine } from '../../types'
 import { config, zh } from '../../config'
+import { DEFAULT_FEATURES } from '../../data/engines'
 import GlitchText from '../ui/GlitchText'
 import { useSound } from '../../hooks/useSoundToggle'
 
 interface Props {
   engine: Engine
   onClose: () => void
+  onInitiate: (e: Engine) => void
 }
 
-export default function DetailModal({ engine, onClose }: Props) {
+export default function DetailModal({ engine, onClose, onInitiate }: Props) {
   const { play } = useSound()
 
   useEffect(() => {
@@ -21,16 +23,29 @@ export default function DetailModal({ engine, onClose }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const specs: Array<[string, string]> = [
-    ['PLATFORM', engine.platform],
-    ['BUILD CLASS', engine.buildClass],
-    ['RUNTIME MODE', engine.runtimeMode],
-    ['SECURITY LAYER', engine.securityLayer],
-    ['PROCESSING', engine.processing],
-    ['ACCESS CLASS', engine.accessClass],
-    ['STATUS', engine.status],
-    ['INTEGRITY', 'SEALED · SIM'],
-  ]
+  const deviceClass = engine.deviceClass ?? engine.platform
+  const mergeCapability = engine.mergeCapability ?? 'CROSS-MODEL MERGE READY'
+  const compatibility = engine.compatibility ?? 'GOOGLE-SUPPORTED COMPATIBILITY LAYER'
+  const accessModel = engine.accessModel ?? `${config.accessLabel} CLASS`
+  const features = engine.features ?? DEFAULT_FEATURES
+
+  const specs: Array<[string, string]> = useMemo(
+    () => [
+      ['DEVICE CLASS', deviceClass],
+      ['BUILD CLASS', engine.buildClass],
+      ['RUNTIME MODE', engine.runtimeMode],
+      ['MERGE CAPABILITY', mergeCapability],
+      ['COMPATIBILITY', compatibility],
+      ['ACCESS MODEL', accessModel],
+      ['PRICE', `$${engine.price} ${config.currency}`],
+      ['SECURITY LAYER', engine.securityLayer],
+      ['PROCESSING', engine.processing],
+      ['STATUS', engine.status],
+    ],
+    [engine, deviceClass, mergeCapability, compatibility, accessModel],
+  )
+
+  const isTarget = !!engine.isTarget
 
   return (
     <motion.div
@@ -41,7 +56,7 @@ export default function DetailModal({ engine, onClose }: Props) {
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="modal framed"
+        className={`modal framed ${isTarget ? 'modal-target' : ''}`}
         onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, y: 30, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -64,9 +79,23 @@ export default function DetailModal({ engine, onClose }: Props) {
           <span className="chip amber">{engine.status}</span>
           <span className="chip">{engine.accessClass}</span>
           <span className="chip green">SIGNATURE · VALID</span>
+          <span className="chip green">{config.accessLabel}</span>
         </div>
 
-        <p className="m-desc">{engine.summary}</p>
+        <p className="m-desc">
+          {isTarget && engine.targetLines ? engine.targetLines[0] : engine.summary}
+        </p>
+
+        {/* premium phrase strip */}
+        <div className="phrase-strip">
+          {['Cross-model merge ready', 'Google-supported compatibility layer', 'Lifetime access class', 'Native mobile runtime', 'Direct device execution'].map(
+            (p) => (
+              <span className="phrase" key={p}>
+                {p}
+              </span>
+            ),
+          )}
+        </div>
 
         <div className="spec-grid">
           {specs.map(([k, v]) => (
@@ -77,17 +106,40 @@ export default function DetailModal({ engine, onClose }: Props) {
           ))}
         </div>
 
+        <div className="m-sub" style={{ marginTop: 4 }}>FEATURE GRID</div>
+        <ul className="feature-grid">
+          {features.map((f) => (
+            <li key={f}>{f}</li>
+          ))}
+        </ul>
+
+        {isTarget && engine.marketing && (
+          <div className="phrase-strip" style={{ marginTop: 12 }}>
+            {engine.marketing.map((m) => (
+              <span className="phrase amber" key={m}>
+                {m}
+              </span>
+            ))}
+          </div>
+        )}
+
         <div className="m-desc faded" style={{ fontSize: 11.5 }}>
-          NOTE // This is a fictional package inside a prank simulation. Nothing is
-          downloadable, installable, or real. {config.simulationLabel}.
+          NOTE // Fictional package inside a prank simulation. Nothing is downloadable,
+          installable, or real — and "access" costs nothing. {config.simulationLabel}.
         </div>
 
         <div className="m-actions">
           <button className="btn ghost" onClick={onClose}>
             ◂ BACK TO DIRECTORY
           </button>
-          <button className="btn" onClick={() => { play('beep'); onClose() }}>
-            ACKNOWLEDGE
+          <button
+            className={`btn ${isTarget ? 'amber' : 'primary'}`}
+            onClick={() => {
+              play('whoosh')
+              onInitiate(engine)
+            }}
+          >
+            INITIATE ACCESS ▸
           </button>
         </div>
       </motion.div>

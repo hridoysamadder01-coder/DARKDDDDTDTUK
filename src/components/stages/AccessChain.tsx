@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import type { Engine } from '../../types'
 import { useSequence, type SequenceStep } from '../../hooks/useSequence'
 import { useSound } from '../../hooks/useSoundToggle'
 import { logFragments, renderFragment, pick } from '../../lib/random'
@@ -28,8 +29,9 @@ const STEPS: Step[] = [
   { text: 'AUTHORIZATION TOKEN REQUIRED', pct: 96, flash: true },
 ]
 
-export default function AccessChain({ onDone }: { onDone: () => void }) {
+export default function AccessChain({ engine, onDone }: { engine: Engine; onDone: () => void }) {
   const { play } = useSound()
+  const chainLabel = useMemo(() => engine.name.split('//').slice(0, 2).join('//').trim(), [engine.name])
   const [headline, setHeadline] = useState(STEPS[0].text)
   const [targetPct, setTargetPct] = useState(0)
   const [pct, setPct] = useState(0)
@@ -127,7 +129,7 @@ export default function AccessChain({ onDone }: { onDone: () => void }) {
               exit={{ opacity: 0 }}
             >
               <div className="chain-status faded" style={{ fontSize: 11, letterSpacing: '0.24em', color: 'var(--text-dim)' }}>
-                OBSIDIAN CORE X // ACCESS CHAIN
+                {chainLabel} // ACCESS CHAIN
               </div>
               <div className="pct">{Math.round(pct)}%</div>
               <div style={{ maxWidth: 460, margin: '0 auto 10px' }}>

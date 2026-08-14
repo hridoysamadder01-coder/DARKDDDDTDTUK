@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import type { PaymentChannel } from '../../types'
+import type { CryptoAsset, Engine } from '../../types'
 import { config, zh } from '../../config'
 import { useCountdown } from '../../hooks/useCountdown'
 import { useSound } from '../../hooks/useSoundToggle'
@@ -9,51 +9,46 @@ import VerifyFlow from './VerifyFlow'
 import GlitchText from '../ui/GlitchText'
 
 interface Props {
-  channel: PaymentChannel
+  engine: Engine
+  coin: CryptoAsset
   onBack: () => void
   onDone: () => void
 }
 
-const isBinance = (c: PaymentChannel) => c === 'binance'
+const NETWORKS = ['SIM-NET', 'GHOSTCHAIN', 'NODE-X', 'VAULT-NET', 'ZERO-LINK']
+const REFS = ['SIM-REF-X93-7A11', 'VAULT-KEY-02X', 'CHAIN-SESSION-44']
 
-export default function PayScreen({ channel, onBack, onDone }: Props) {
+/** Cinematic fake crypto session for the chosen asset. Simulation only. */
+export default function CryptoSession({ engine, coin, onBack, onDone }: Props) {
   const { play } = useSound()
   const [verifying, setVerifying] = useState(false)
   const { remaining, label } = useCountdown(config.countdownSeconds)
 
-  const binance = isBinance(channel)
-  const title = binance ? 'BINANCE SECURE PAY' : 'CRYPTO SECURE GATEWAY'
-
-  const rows: Array<[string, string, 'green' | 'amber' | 'red' | undefined]> = binance
-    ? [
-        ['AMOUNT', `$${config.price} ${config.currency}`, undefined],
-        ['METHOD', 'BINANCE', 'amber'],
-        ['NETWORK', 'SIM-BEP20', undefined],
-        ['SESSION', 'AWAITING PAYMENT', 'amber'],
-      ]
-    : [
-        ['AMOUNT', `$${config.price} ${config.currency}`, undefined],
-        ['STATUS', 'CHANNEL OPEN', 'green'],
-        ['NETWORK', 'SIM-NET · GHOSTCHAIN', undefined],
-        ['ROUTE', 'NODE-X → VAULT-NET', undefined],
-      ]
+  const rows: Array<[string, string, 'green' | 'amber' | 'red' | undefined]> = [
+    ['ASSET', `${coin.sym} · ${coin.name}`, 'green'],
+    ['AMOUNT', `$${engine.price} ${config.currency}`, undefined],
+    ['ACCESS CLASS', config.accessLabel, 'amber'],
+    ['STATUS', 'AWAITING CONFIRMATION', 'amber'],
+  ]
 
   return (
     <div className="cine">
       <motion.div
-        className={`paypanel panel framed ${binance ? 'binance' : 'crypto'}`}
+        className="paypanel panel framed crypto"
         initial={{ opacity: 0, y: 24, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 240, damping: 22 }}
       >
         <div className="bar">
-          <span className="title">{title}</span>
-          <span className="chip amber">{config.bilingualLabels ? zh.verifying : 'DEMO'}</span>
+          <span className="title">CRYPTO SECURE SESSION</span>
+          <span className="chip green">{coin.sym}</span>
         </div>
 
         <div className="body">
-          <div className="amount">${config.price}</div>
-          <div className="amount-sub">{config.currency} · ONE-TIME PRIVATE ACCESS</div>
+          <div className="amount">${engine.price}</div>
+          <div className="amount-sub">
+            {config.currency} · {config.accessLabel}
+          </div>
 
           <div className="rows">
             {rows.map(([k, v, tone]) => (
@@ -66,17 +61,34 @@ export default function PayScreen({ channel, onBack, onDone }: Props) {
 
           {!verifying && (
             <>
+              <div className="net-row">
+                {NETWORKS.map((n) => (
+                  <span className="chip" key={n}>
+                    {n}
+                  </span>
+                ))}
+              </div>
+
               <QrDecor />
               <div className="qr-note">DEMO QR // NON-PAYABLE</div>
+
               <div className="wallet">
-                {binance ? 'DEPOSIT REF' : 'ROUTE REF'} ·{' '}
-                <b>{binance ? 'DEMO-WALLET-7X93-A11F' : 'SIM-VAULT-GHOST-4F0X'}</b>
-                <div style={{ fontSize: 10, marginTop: 6, letterSpacing: '0.14em' }} className="faded">
-                  NOT A REAL ADDRESS · SIMULATION LABEL ONLY
+                SESSION REF · <b>{REFS[0]}</b>
+                <div style={{ marginTop: 6, display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {REFS.slice(1).map((r) => (
+                    <span className="chip" key={r}>
+                      {r}
+                    </span>
+                  ))}
+                </div>
+                <div style={{ fontSize: 10, marginTop: 8, letterSpacing: '0.14em' }} className="faded">
+                  NOT A REAL ADDRESS OR PAYLOAD · SIMULATION LABEL ONLY
                 </div>
               </div>
+
               <div className={`timer ${remaining < 60 ? 'low' : ''}`}>
                 SESSION EXPIRES IN {label}
+                {config.bilingualLabels ? ` · ${zh.verifying}` : ''}
               </div>
             </>
           )}
@@ -86,7 +98,7 @@ export default function PayScreen({ channel, onBack, onDone }: Props) {
           {!verifying && (
             <div className="row-center mt24">
               <button className="btn ghost" onClick={onBack}>
-                ◂ BACK
+                ◂ CHANGE ASSET
               </button>
               <button
                 className="btn primary"
@@ -95,7 +107,7 @@ export default function PayScreen({ channel, onBack, onDone }: Props) {
                   setVerifying(true)
                 }}
               >
-                VERIFY PAYMENT
+                VERIFY ACCESS
               </button>
             </div>
           )}
@@ -103,8 +115,8 @@ export default function PayScreen({ channel, onBack, onDone }: Props) {
       </motion.div>
 
       <div className="faded mt16" style={{ maxWidth: 460, textAlign: 'center', fontSize: 11, letterSpacing: '0.1em' }}>
-        <GlitchText text={config.simulationLabel} intensity={0.05} /> — this screen is a
-        cosmetic mock. No wallet, no transaction, no payment API is involved.
+        <GlitchText text={config.simulationLabel} intensity={0.05} /> — this session is a
+        cosmetic mock. No wallet, no chain, no transaction, no payment API is involved.
       </div>
     </div>
   )

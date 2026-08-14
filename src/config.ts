@@ -15,12 +15,12 @@ export interface AppConfig {
   targetProductName: string
   /** Short target codename used in headings. */
   targetCodename: string
-  /** One-time access price (numeric, no currency symbol). */
+  /** Headline access price of the primary target (numeric, no symbol). */
   price: number
   /** Currency label shown after the price. */
   currency: string
-  /** Price "count-down" animation frames before landing on `price`. */
-  priceLadder: number[]
+  /** Access-model label shown under the price and on cards. */
+  accessLabel: string
 
   /** Final prank punchline. */
   finalPrankMessage: string
@@ -52,7 +52,7 @@ export const config: AppConfig = {
   targetCodename: 'OBSIDIAN CORE X',
   price: 430,
   currency: 'USD',
-  priceLadder: [980, 760, 645, 520, 471, 442],
+  accessLabel: 'LIFETIME ACCESS',
 
   finalPrankMessage: 'PRANK SUCCESS 😈',
   finalPrankSubtitle: 'YOU JUST ENTERED A SIMULATION.',

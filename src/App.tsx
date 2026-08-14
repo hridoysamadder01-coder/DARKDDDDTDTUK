@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import type { PaymentChannel, Stage } from './types'
+import type { CryptoAsset, Engine, Stage } from './types'
+import { targetEngine } from './data/engines'
 import { Background } from './components/background/Background'
 import CRTOverlay from './components/background/CRTOverlay'
 import SimulationBadge from './components/ui/SimulationBadge'
@@ -9,7 +10,7 @@ import BootSequence from './components/stages/BootSequence'
 import Terminal from './components/stages/Terminal'
 import AccessChain from './components/stages/AccessChain'
 import PriceReveal from './components/stages/PriceReveal'
-import PayScreen from './components/stages/PayScreen'
+import CryptoSession from './components/stages/CryptoSession'
 import FinalReveal from './components/stages/FinalReveal'
 
 const fade = {
@@ -21,14 +22,16 @@ const fade = {
 
 export default function App() {
   const [stage, setStage] = useState<Stage>('boot')
-  const [channel, setChannel] = useState<PaymentChannel>('binance')
+  const [engine, setEngine] = useState<Engine>(targetEngine)
+  const [coin, setCoin] = useState<CryptoAsset | null>(null)
 
   // Pause the heavy background canvases during full-screen cinematic stages
   // that already carry their own motion (keeps mobile framerate healthy).
   const heavyBgPaused = stage === 'accessChain' || stage === 'final'
 
   const goTerminal = useCallback(() => setStage('terminal'), [])
-  const startTarget = useCallback(() => {
+  const initiate = useCallback((e: Engine) => {
+    setEngine(e)
     window.scrollTo({ top: 0 })
     setStage('accessChain')
   }, [])
@@ -60,31 +63,33 @@ export default function App() {
 
           {stage === 'terminal' && (
             <motion.div key="terminal" {...fade}>
-              <Terminal onTarget={startTarget} />
+              <Terminal onInitiate={initiate} />
             </motion.div>
           )}
 
           {stage === 'accessChain' && (
             <motion.div key="chain" {...fade}>
-              <AccessChain onDone={() => setStage('priceReveal')} />
+              <AccessChain engine={engine} onDone={() => setStage('priceReveal')} />
             </motion.div>
           )}
 
           {stage === 'priceReveal' && (
             <motion.div key="price" {...fade}>
               <PriceReveal
+                engine={engine}
                 onSelect={(c) => {
-                  setChannel(c)
-                  setStage(c === 'binance' ? 'binance' : 'crypto')
+                  setCoin(c)
+                  setStage('cryptoSession')
                 }}
               />
             </motion.div>
           )}
 
-          {(stage === 'binance' || stage === 'crypto') && (
-            <motion.div key={`pay-${channel}`} {...fade}>
-              <PayScreen
-                channel={channel}
+          {stage === 'cryptoSession' && coin && (
+            <motion.div key="crypto" {...fade}>
+              <CryptoSession
+                engine={engine}
+                coin={coin}
                 onBack={() => setStage('priceReveal')}
                 onDone={() => setStage('final')}
               />
@@ -93,7 +98,7 @@ export default function App() {
 
           {stage === 'final' && (
             <motion.div key="final" {...fade}>
-              <FinalReveal onRestart={restart} />
+              <FinalReveal engine={engine} onRestart={restart} />
             </motion.div>
           )}
         </AnimatePresence>

@@ -17,7 +17,7 @@ A persistent **`SIMULATION // PRANK ENVIRONMENT`** label is always on screen.
 
 This is a visual prank only. It contains **no** real functionality of any kind:
 
-- ❌ no real payments, no Binance API, no Binance Pay, no crypto/wallet connection
+- ❌ no real payments, no payment APIs, no crypto exchange integration, no wallet connection
 - ❌ no blockchain transactions, no real QR payloads (the QR is decorative and encodes nothing)
 - ❌ no seed-phrase / password / credential collection, no login capture, no phishing
 - ❌ no personal-data collection, IP harvesting, device fingerprinting, or tracking
@@ -25,8 +25,15 @@ This is a visual prank only. It contains **no** real functionality of any kind:
 
 Every "payment", "verification", "network", and "authorization" moment is pure
 front-end theatre driven by timers and animation. Nothing is ever sent, stored,
-or charged. Wallet-style labels (e.g. `DEMO-WALLET-7X93-A11F`) are intentionally
+or charged. Session-reference labels (e.g. `SIM-REF-X93-7A11`) are intentionally
 fake formats, marked `DEMO QR // NON-PAYABLE`.
+
+### Flow
+
+`boot → terminal + 15-build marketplace → detail panel → OBSIDIAN CORE X access
+chain → price reveal ($430 · LIFETIME ACCESS) → SELECT CRYPTO ASSET
+(BTC · SOL · ETH · USDT · LTC · XRP) → fake crypto session → fake verification →
+ACCESS GRANTED → PRANK SUCCESS 😈`
 
 ---
 
