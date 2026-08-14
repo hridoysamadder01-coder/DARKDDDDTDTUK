@@ -1,82 +1,113 @@
 import { useEffect, useRef } from 'react'
+import { intensityProfile, config } from '../../config'
 
-/** Lean green matrix rain, drawn faintly behind the UI. */
-const GLYPHS = '01ABCDEF0123456789<>[]{}#%$@!?/\\|=+-ｦｱｳｴｵｶｷｸｹｺｻ'
+/**
+ * Layer A — falling code streams (matrix rain) drawn on a canvas.
+ * Mixes binary, hex, glyphs and command fragments at varying speeds.
+ */
+const GLYPHS =
+  '01ABCDEF0123456789<>[]{}#%&$@!?/\\|=+-珠核码密访问节点权限令牌ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜ'
 
-export default function CodeRain() {
-  const ref = useRef<HTMLCanvasElement>(null)
+export default function CodeRain({ paused = false }: { paused?: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const canvas = ref.current
+    const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d', { alpha: true })
     if (!ctx) return
 
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    let w = 0, h = 0, cols = 0, font = 15, dpr = 1
+    const density = intensityProfile[config.animationIntensity].rainDensity
+    let width = 0
+    let height = 0
+    let columns = 0
+    let fontSize = 16
     let drops: number[] = []
     let speeds: number[] = []
+    let dpr = 1
+
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
     const setup = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2)
-      w = window.innerWidth
-      h = window.innerHeight
-      canvas.width = Math.floor(w * dpr)
-      canvas.height = Math.floor(h * dpr)
-      canvas.style.width = w + 'px'
-      canvas.style.height = h + 'px'
+      width = window.innerWidth
+      height = window.innerHeight
+      canvas.width = Math.floor(width * dpr)
+      canvas.height = Math.floor(height * dpr)
+      canvas.style.width = width + 'px'
+      canvas.style.height = height + 'px'
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      font = w < 640 ? 13 : 15
-      cols = Math.floor(w / font)
-      drops = new Array(cols)
-      speeds = new Array(cols)
-      for (let i = 0; i < cols; i++) {
-        drops[i] = Math.random() * -h
-        speeds[i] = 0.5 + Math.random() * 1.2
+      fontSize = width < 640 ? 13 : 16
+      columns = Math.floor((width / fontSize) * density)
+      drops = new Array(columns)
+      speeds = new Array(columns)
+      for (let i = 0; i < columns; i++) {
+        drops[i] = Math.random() * -height
+        speeds[i] = 0.5 + Math.random() * 1.4
       }
     }
+
     setup()
 
-    let raf = 0, last = 0
-    const gap = reduce ? 140 : 55
+    let raf = 0
+    let last = 0
+    const frameGap = reduce ? 120 : 45 // ms — throttle for perf
 
     const draw = (t: number) => {
       raf = requestAnimationFrame(draw)
-      if (t - last < gap) return
+      if (paused) return
+      if (t - last < frameGap) return
       last = t
-      ctx.fillStyle = 'rgba(4, 8, 6, 0.18)'
-      ctx.fillRect(0, 0, w, h)
-      ctx.font = `${font}px ${'ui-monospace, monospace'}`
+
+      // translucent black fade → trails
+      ctx.fillStyle = 'rgba(2, 6, 4, 0.16)'
+      ctx.fillRect(0, 0, width, height)
+      ctx.font = `${fontSize}px var(--font-mono, monospace)`
       ctx.textBaseline = 'top'
-      const cw = w / cols
-      for (let i = 0; i < cols; i++) {
+
+      const colW = width / columns
+      for (let i = 0; i < columns; i++) {
         const ch = GLYPHS[Math.floor(Math.random() * GLYPHS.length)]
-        const x = i * cw
+        const x = i * colW
         const y = drops[i]
-        if (Math.random() > 0.975) {
-          ctx.fillStyle = 'rgba(190, 255, 228, 0.9)'
+
+        // leading char brighter
+        const lead = Math.random() > 0.965
+        if (lead) {
+          ctx.fillStyle = 'rgba(200, 255, 230, 0.95)'
+          ctx.shadowColor = 'rgba(0,255,156,0.9)'
+          ctx.shadowBlur = 10
         } else {
-          ctx.fillStyle = `rgba(0, 255, 163, ${0.25 + Math.random() * 0.4})`
+          const shade = 0.28 + Math.random() * 0.5
+          ctx.fillStyle = `rgba(0, 255, 156, ${shade})`
+          ctx.shadowBlur = 0
         }
         ctx.fillText(ch, x, y)
-        if (y > h && Math.random() > 0.975) {
-          drops[i] = Math.random() * -100
-          speeds[i] = 0.5 + Math.random() * 1.2
+        ctx.shadowBlur = 0
+
+        if (y > height && Math.random() > 0.975) {
+          drops[i] = Math.random() * -120
+          speeds[i] = 0.5 + Math.random() * 1.4
         }
-        drops[i] += font * speeds[i] * 0.5
+        drops[i] += fontSize * speeds[i] * 0.5
       }
     }
+
     raf = requestAnimationFrame(draw)
 
-    let rt: number | undefined
-    const onResize = () => { window.clearTimeout(rt); rt = window.setTimeout(setup, 180) }
+    let resizeTimer: number | undefined
+    const onResize = () => {
+      window.clearTimeout(resizeTimer)
+      resizeTimer = window.setTimeout(setup, 180)
+    }
     window.addEventListener('resize', onResize)
+
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', onResize)
-      window.clearTimeout(rt)
+      window.clearTimeout(resizeTimer)
     }
-  }, [])
+  }, [paused])
 
-  return <canvas ref={ref} className="matrix" aria-hidden />
+  return <canvas ref={canvasRef} className="bg-canvas" style={{ opacity: 0.5 }} aria-hidden />
 }

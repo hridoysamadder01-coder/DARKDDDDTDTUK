@@ -2,7 +2,7 @@
  * ─────────────────────────────────────────────────────────────
  *  CENTRAL CONFIG
  * ─────────────────────────────────────────────────────────────
- *  Change the values below to re-skin the whole prank experience.
+ *  Change the values below to re-tune the whole experience.
  *  Everything here is cosmetic. There is NO real payment, wallet,
  *  network, or verification logic anywhere in this project.
  * ─────────────────────────────────────────────────────────────
@@ -11,72 +11,61 @@
 export type AnimationIntensity = 'low' | 'medium' | 'high'
 
 export interface AppConfig {
-  /** Product/platform brand shown in the nav + splash. */
-  brandName: string
-  brandTagline: string
-
   /** Primary target product name shown on the hero card. */
   targetProductName: string
+  /** Short target codename used in headings. */
   targetCodename: string
-
   /** Headline access price of the primary target (numeric, no symbol). */
   price: number
+  /** Currency label shown after the price. */
   currency: string
   /** Access-model label shown under the price and on cards. */
   accessLabel: string
+  /** Descending "calculating" ladder for the primary price reveal. */
+  priceLadder: number[]
 
-  /** Final reveal copy. */
-  finalPrankMessage: string
-  finalPrankSubtitle: string
-  finalPrankNote: string
-
+  /** Sound on by default? (Browsers still require a user gesture.) */
   soundEnabledByDefault: boolean
+  /** Global animation intensity. */
   animationIntensity: AnimationIntensity
 
-  /** Splash duration hint in ms (used for pacing). */
+  /** Boot sequence duration hint in ms (used for pacing). */
   bootDurationMs: number
-  /** Fake payment countdown, in seconds. */
+  /** Access-session countdown, in seconds. */
   countdownSeconds: number
 
+  /** Supported platform tags. */
   supportedPlatforms: string[]
 
-  /** Show the small Chinese atmosphere labels? (off for the clean product look) */
+  /** Show the small Chinese metadata micro-labels? */
   bilingualLabels: boolean
 
-  /** The persistent, always-visible safety label. */
-  simulationLabel: string
+  /** Neutral notice shown only inside the financial (access) screen. */
+  financialNotice: string
 }
 
 export const config: AppConfig = {
-  brandName: 'Core Engine',
-  brandTagline: 'Private Build Distribution',
-
-  targetProductName: 'Obsidian Core X — Universal Native Build',
-  targetCodename: 'Obsidian Core X',
-
+  targetProductName: 'OBSIDIAN CORE X // UNIVERSAL NATIVE BUILD',
+  targetCodename: 'OBSIDIAN CORE X',
   price: 430,
   currency: 'USD',
-  accessLabel: 'Lifetime access',
-
-  finalPrankMessage: 'It was a simulation.',
-  finalPrankSubtitle: 'You just got pranked — nothing here was real.',
-  finalPrankNote:
-    'No payment was taken, no wallet was touched, and no software was delivered. Every price, address, and confirmation you saw was a front-end mock built purely for the prank.',
+  accessLabel: 'LIFETIME ACCESS',
+  priceLadder: [980, 760, 645, 520, 471, 442],
 
   soundEnabledByDefault: false,
   animationIntensity: 'high',
 
-  bootDurationMs: 3200,
+  bootDurationMs: 4800,
   countdownSeconds: 899, // 14:59
 
-  supportedPlatforms: ['Android', 'iPhone', 'Tablet', 'Universal'],
+  supportedPlatforms: ['ANDROID', 'IPHONE', 'TABLET', 'UNIVERSAL'],
 
-  bilingualLabels: false,
+  bilingualLabels: true,
 
-  simulationLabel: 'SIMULATION // PRANK ENVIRONMENT',
+  financialNotice: 'NO REAL TRANSACTIONS',
 }
 
-/** Small Chinese atmosphere labels (optional flavour). */
+/** Small Chinese metadata micro-labels (used sparingly for flavour). */
 export const zh = {
   coreEngine: '核心引擎',
   encrypted: '已加密',
@@ -87,6 +76,7 @@ export const zh = {
   connected: '已连接',
 } as const
 
+/** Intensity → tuning multipliers used across canvases & timings. */
 export const intensityProfile: Record<
   AnimationIntensity,
   { rainDensity: number; nodes: number; glitchRate: number; flicker: number }

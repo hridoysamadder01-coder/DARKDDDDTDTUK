@@ -1,11 +1,18 @@
-export type Stage = 'splash' | 'catalog' | 'access' | 'checkout' | 'invoice' | 'complete'
+export type Stage =
+  | 'boot'
+  | 'terminal'
+  | 'accessChain'
+  | 'priceReveal'
+  | 'cryptoSession'
+  | 'final'
 
 export type EngineStatus =
   | 'AVAILABLE // LIFETIME ACCESS'
-  | 'VERIFIED // GOOGLE-SUPPORTED'
+  | 'VERIFIED // NATIVE BUILD'
   | 'UNIVERSAL // READY'
   | 'PRIVATE // CROSS-MODEL'
   | 'RESTRICTED // NATIVE BUILD'
+  | 'RESTRICTED // HIGH CLEARANCE'
 
 export interface Engine {
   id: string
@@ -21,7 +28,7 @@ export interface Engine {
   processing: string
   accessClass: string
 
-  /** Optional premium detail fields (fall back to sensible defaults). */
+  /** Optional premium detail-panel fields (fall back to sensible defaults). */
   deviceClass?: string
   mergeCapability?: string
   compatibility?: string
@@ -30,7 +37,9 @@ export interface Engine {
 
   /** The single primary target build. */
   isTarget?: boolean
+  /** Longer description lines for the hero card / detail. */
   targetLines?: string[]
+  /** Extra marketing one-liners shown on the target. */
   marketing?: string[]
 }
 
@@ -39,11 +48,6 @@ export interface CryptoAsset {
   sym: string
   name: string
   sub: string
-  network: string
-  /** Approximate USD price, used only to render a realistic crypto amount. */
-  rate: number
-  /** Brand colour for the coin badge. */
-  color: string
-  /** BTC & SOL render as the recommended options. */
+  /** BTC & SOL render as the strongest options. */
   strong?: boolean
 }

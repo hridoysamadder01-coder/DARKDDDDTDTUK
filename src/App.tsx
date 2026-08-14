@@ -2,105 +2,106 @@ import { useCallback, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { CryptoAsset, Engine, Stage } from './types'
 import { targetEngine } from './data/engines'
-import { Ambient } from './components/background/Ambient'
-import SimulationBadge from './components/ui/SimulationBadge'
-import Splash from './components/stages/Splash'
-import Storefront from './components/stages/Storefront'
+import { Background } from './components/background/Background'
+import CRTOverlay from './components/background/CRTOverlay'
+import SoundToggle from './components/ui/SoundToggle'
+import BootSequence from './components/stages/BootSequence'
+import Terminal from './components/stages/Terminal'
 import AccessChain from './components/stages/AccessChain'
-import Checkout from './components/stages/Checkout'
-import Invoice from './components/stages/Invoice'
-import Complete from './components/stages/Complete'
+import PriceReveal from './components/stages/PriceReveal'
+import CryptoSession from './components/stages/CryptoSession'
+import FinalReveal from './components/stages/FinalReveal'
 
 const fade = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
-  transition: { duration: 0.4 },
+  transition: { duration: 0.5 },
 }
 
 export default function App() {
-  const [stage, setStage] = useState<Stage>('splash')
+  const [stage, setStage] = useState<Stage>('boot')
   const [engine, setEngine] = useState<Engine>(targetEngine)
   const [coin, setCoin] = useState<CryptoAsset | null>(null)
 
-  const toCatalog = useCallback(() => {
-    window.scrollTo({ top: 0 })
-    setStage('catalog')
-  }, [])
+  // Pause the heavy background canvases during full-screen cinematic stages
+  // that already carry their own motion (keeps mobile framerate healthy).
+  const heavyBgPaused = stage === 'accessChain' || stage === 'final'
 
-  const getAccess = useCallback((e: Engine) => {
+  const goTerminal = useCallback(() => setStage('terminal'), [])
+  const initiate = useCallback((e: Engine) => {
     setEngine(e)
     window.scrollTo({ top: 0 })
-    setStage('access')
+    setStage('accessChain')
+  }, [])
+  const restart = useCallback(() => {
+    window.scrollTo({ top: 0 })
+    setStage('terminal')
   }, [])
 
   return (
     <>
-      <Ambient />
+      <Background paused={heavyBgPaused} />
+      <CRTOverlay />
 
-      {stage === 'splash' && (
-        <button className="skip-btn" onClick={toCatalog}>
-          Skip intro
+      {/* Persistent chrome */}
+      <SoundToggle />
+      {stage === 'boot' && (
+        <button className="skip-btn" onClick={goTerminal}>
+          SKIP ▸
         </button>
       )}
 
       <div className="stage-root">
         <AnimatePresence mode="wait">
-          {stage === 'splash' && (
-            <motion.div key="splash" {...fade}>
-              <Splash onDone={toCatalog} />
+          {stage === 'boot' && (
+            <motion.div key="boot" {...fade}>
+              <BootSequence onDone={goTerminal} />
             </motion.div>
           )}
 
-          {stage === 'catalog' && (
-            <motion.div key="catalog" {...fade}>
-              <Storefront onGetAccess={getAccess} />
+          {stage === 'terminal' && (
+            <motion.div key="terminal" {...fade}>
+              <Terminal onInitiate={initiate} />
             </motion.div>
           )}
 
-          {stage === 'access' && (
-            <motion.div key="access" {...fade}>
-              <AccessChain engine={engine} onDone={() => setStage('checkout')} />
+          {stage === 'accessChain' && (
+            <motion.div key="chain" {...fade}>
+              <AccessChain engine={engine} onDone={() => setStage('priceReveal')} />
             </motion.div>
           )}
 
-          {stage === 'checkout' && (
-            <motion.div key="checkout" {...fade}>
-              <Checkout
+          {stage === 'priceReveal' && (
+            <motion.div key="price" {...fade}>
+              <PriceReveal
                 engine={engine}
-                onBack={toCatalog}
                 onSelect={(c) => {
                   setCoin(c)
-                  window.scrollTo({ top: 0 })
-                  setStage('invoice')
+                  setStage('cryptoSession')
                 }}
               />
             </motion.div>
           )}
 
-          {stage === 'invoice' && coin && (
-            <motion.div key="invoice" {...fade}>
-              <Invoice
+          {stage === 'cryptoSession' && coin && (
+            <motion.div key="crypto" {...fade}>
+              <CryptoSession
                 engine={engine}
                 coin={coin}
-                onBack={() => setStage('checkout')}
-                onDone={() => {
-                  window.scrollTo({ top: 0 })
-                  setStage('complete')
-                }}
+                onBack={() => setStage('priceReveal')}
+                onDone={() => setStage('final')}
               />
             </motion.div>
           )}
 
-          {stage === 'complete' && (
-            <motion.div key="complete" {...fade}>
-              <Complete engine={engine} onRestart={toCatalog} />
+          {stage === 'final' && (
+            <motion.div key="final" {...fade}>
+              <FinalReveal engine={engine} onRestart={restart} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
-      <SimulationBadge />
     </>
   )
 }

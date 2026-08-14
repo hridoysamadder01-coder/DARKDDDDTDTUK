@@ -1,51 +1,54 @@
-# Core Engine — a cinematic prank storefront
+# CORE ENGINE ACCESS TERMINAL
 
-> A **prank** website disguised as a premium software-distribution product.
-> **100% simulation. Frontend-only. Completely harmless.**
+> A cinematic **underground software-access terminal** — a believable, dense
+> neon-green control-software experience. Frontend-only. No real transactions.
 
-It looks like a real, modern dark product UI — a private "build marketplace"
-with a featured product, a real-feeling checkout, a crypto payment page, and a
-provisioning + success flow — then reveals the punchline:
+Boot into a restricted terminal, browse a private **build marketplace** of 15
+fictional engine builds, inspect a build, then run the **OBSIDIAN CORE X**
+access chain: a GSAP-driven cinematic unlock → dramatic price reveal → digital
+asset selection → access session → verification (with a hard signature-conflict
+interrupt + override) → **ACCESS GRANTED**.
 
-> **It was a simulation. You just got pranked — nothing here was real.**
-
-A persistent **`SIMULATION // PRANK ENVIRONMENT`** label is always on screen.
+The whole experience is a visual simulation — it feels like a screen from a
+cyber-thriller, but nothing behind it is real.
 
 ---
 
-## 🛑 Safety — what this project does NOT do
+## 🛑 Safety
 
-This is a visual prank only. It contains **no** real functionality of any kind:
+Every "payment", "network", and "verification" moment is pure front-end theatre
+driven by timers and animation. Specifically, this project contains **no**:
 
-- ❌ no real payments, no payment APIs, no crypto exchange integration, no wallet connection
-- ❌ no blockchain transactions, no real QR payloads (the QR is decorative and encodes nothing)
-- ❌ no seed-phrase / password / credential collection, no login capture, no phishing
-- ❌ no personal-data collection, IP harvesting, device fingerprinting, or tracking
-- ❌ no backend, no database, no network requests to any third party
-- ❌ no impersonation of any real brand (the store, products, and coins are fictional)
+- real payments, payment APIs, wallet connections, or exchange integrations
+- blockchain transactions
+- valid cryptocurrency addresses (references like `SESSION-X93-A11` are synthetic)
+- scannable payment QR codes (the QR graphic is decorative and encodes nothing)
+- credential / seed-phrase / password collection
+- personal-data collection, IP/location capture, or device fingerprinting
+- backend, database, or third-party network requests
 
-Every "payment", "verification", and "provisioning" moment is pure front-end
-theatre driven by timers and animation. Nothing is ever sent, stored, or
-charged. The payment address is an intentionally fake, clearly-marked demo
-string (`Demo address — not a real wallet`), and the QR is labelled
-`DEMO QR — NON-PAYABLE`.
+A single neutral notice — **`NO REAL TRANSACTIONS`** — appears only inside the
+financial (access session) screen. The product/brand/asset names are fictional,
+and Gemini is referenced only as *"compatible with Gemini vision workflows"* — no
+claim of an official Google product or partnership.
 
 ---
 
 ## 🧭 Flow
 
-`splash → storefront (featured build + 15-product catalog) → product detail →
-checkout (order summary + choose crypto currency) → crypto payment page
-(amount, network, demo QR, demo address, countdown) → "I've paid → verify" →
-verification → provisioning → "Access activated" → It was a simulation.`
+`boot → terminal (system HUD + 15-build marketplace) → build inspection →
+OBSIDIAN access chain (GSAP master timeline) → price reveal ($980…→ $430) →
+select digital asset (BTC · SOL · ETH · USDT · LTC · XRP) → access session
+(synthetic refs, decorative QR, countdown) → VERIFY ACCESS → SIGNATURE CONFLICT
+→ OVERRIDE ACCEPTED → ACCESS AUTHENTICATED → ACCESS GRANTED → runtime online`
 
 ## 🧰 Stack
 
 - **React 18 + Vite 5 + TypeScript** (strict)
-- **Framer Motion** for stage transitions & micro-interactions
-- **CSS design system** — modern dark product UI (ambient gradient background,
-  system sans-serif, mono for figures), no images required
-- **Web Audio API** for subtle UI sound (no audio files, nothing autoplays)
+- **GSAP** — the OBSIDIAN access-chain master timeline
+- **Framer Motion** — screen transitions
+- **HTML5 Canvas** — matrix code field + network-node layer + CRT/scanline layer
+- **Web Audio API** — subtle terminal sound (muted by default; nothing autoplays)
 
 ## 🚀 Run locally
 
@@ -58,38 +61,22 @@ npm run preview    # preview the production build
 
 ## 🎛️ Configuration
 
-All the main knobs live in [`src/config.ts`](src/config.ts) — brand name,
-price, access label, the final reveal copy, splash duration, payment countdown,
-sound default, and the persistent simulation label. The product catalog lives
-in [`src/data/engines.ts`](src/data/engines.ts) and the payment currencies in
+Central knobs live in [`src/config.ts`](src/config.ts) — target build, price,
+price ladder, access label, boot duration, countdown, sound default, animation
+intensity, bilingual labels, and the financial notice. The catalog is in
+[`src/data/engines.ts`](src/data/engines.ts) and the assets in
 [`src/data/coins.ts`](src/data/coins.ts).
 
 ## 🌐 Deployment
 
-### GitHub Pages (automated)
-
 Pushing to the deployment branch runs
 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which builds and
-publishes to GitHub Pages. Live URL:
+publishes to GitHub Pages (Settings → Pages → Source: GitHub Actions). Live URL:
 
 **https://hridoysamadder01-coder.github.io/DARKDDDDTDTUK/**
 
-> The repo must be **public** and Pages **Source** set to **GitHub Actions**
-> (Settings → Pages). After that, every push deploys automatically.
-
-### Vercel / Netlify / Render (static)
-
-Served from `dist/`. Because those hosts serve from the site root, build with a
-root base path:
+For Vercel / Netlify / Render (served from root), build with a root base path:
 
 ```bash
-VITE_BASE=/ npm run build
+VITE_BASE=/ npm run build   # output: dist/
 ```
-
-- **Build command:** `VITE_BASE=/ npm run build`
-- **Output directory:** `dist`
-
----
-
-_Made as a harmless cinematic prank. Show a friend, enjoy the reveal, and
-remember: it was all a simulation._
