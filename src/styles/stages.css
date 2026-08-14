@@ -26,7 +26,7 @@
   display: grid;
   place-items: center;
   background: linear-gradient(140deg, var(--accent), var(--accent-2));
-  box-shadow: var(--shadow-accent), 0 0 60px rgba(109, 123, 255, 0.35);
+  box-shadow: var(--shadow-accent), 0 0 60px rgba(0, 255, 163, 0.35);
 }
 .splash .logo-xl svg { width: 34px; height: 34px; }
 .splash .title {
@@ -63,8 +63,8 @@
   border-radius: var(--r-xl);
   border: 1px solid var(--border-2);
   background:
-    radial-gradient(120% 140% at 100% 0%, rgba(155, 107, 255, 0.16), transparent 55%),
-    radial-gradient(120% 160% at 0% 100%, rgba(109, 123, 255, 0.16), transparent 55%),
+    radial-gradient(120% 140% at 100% 0%, rgba(0, 255, 163, 0.14), transparent 55%),
+    radial-gradient(120% 160% at 0% 100%, rgba(0, 220, 160, 0.14), transparent 55%),
     var(--surface-1);
   box-shadow: var(--shadow-lg);
 }
@@ -149,7 +149,7 @@
   height: 84px;
   border-radius: var(--r-sm);
   background:
-    linear-gradient(180deg, rgba(109, 123, 255, 0.22), transparent),
+    linear-gradient(180deg, rgba(0, 255, 163, 0.2), transparent),
     repeating-linear-gradient(90deg, transparent 0 22px, rgba(255,255,255,0.03) 22px 23px);
   border: 1px solid var(--border);
   position: relative;
@@ -160,7 +160,7 @@
   position: absolute;
   left: 0; right: 0; bottom: 0;
   height: 60%;
-  background: linear-gradient(180deg, transparent, rgba(109,123,255,0.12));
+  background: linear-gradient(180deg, transparent, rgba(0,255,163,0.12));
   clip-path: polygon(0 60%, 12% 40%, 26% 55%, 40% 28%, 55% 45%, 70% 22%, 85% 38%, 100% 18%, 100% 100%, 0 100%);
 }
 
@@ -218,7 +218,7 @@
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 15px;
-  color: #cdd3ff;
+  color: #bfffe6;
   background: linear-gradient(140deg, var(--surface-3), var(--surface-2));
   border: 1px solid var(--border-2);
   flex: none;
@@ -400,7 +400,7 @@
 .asset .a-flag {
   position: absolute; top: 10px; right: 10px;
   font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em;
-  color: #b9c0ff; background: var(--accent-soft); border: 1px solid var(--accent-line);
+  color: #7dffcf; background: var(--accent-soft); border: 1px solid var(--accent-line);
   padding: 2px 6px; border-radius: var(--r-pill);
 }
 
@@ -502,7 +502,7 @@
   border-radius: 20px;
   display: grid; place-items: center;
   background: linear-gradient(140deg, var(--accent), var(--accent-2));
-  box-shadow: var(--shadow-accent), 0 0 60px rgba(109,123,255,0.3);
+  box-shadow: var(--shadow-accent), 0 0 60px rgba(0,255,163,0.3);
 }
 .reveal .emblem svg { width: 34px; height: 34px; color: #fff; }
 .reveal h1 { margin: 0; font-size: clamp(30px, 8vw, 52px); font-weight: 750; letter-spacing: -0.035em; line-height: 1.02; }
@@ -514,3 +514,69 @@
 /* utility */
 .center-col { display: flex; flex-direction: column; align-items: center; }
 .divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+/* ===================== ACCESS CHAIN (dramatic unlock) ===================== */
+.access {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100dvh; padding: 30px 20px 90px; text-align: center;
+}
+.access .inner { width: 100%; max-width: 560px; }
+.chain-card { padding: 26px 22px; position: relative; overflow: hidden; }
+.chain-pct {
+  font-family: var(--font-mono);
+  font-size: clamp(46px, 13vw, 84px);
+  font-weight: 800;
+  color: var(--accent);
+  text-shadow: 0 0 34px var(--accent-glow);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 8px 0 14px;
+  font-variant-numeric: tabular-nums;
+}
+.chain-headline {
+  font-family: var(--font-mono);
+  font-size: clamp(13px, 3.4vw, 16px);
+  color: var(--text);
+  letter-spacing: 0.02em;
+  min-height: 1.4em;
+  margin-top: 14px;
+}
+.chain-log {
+  margin-top: 18px;
+  text-align: left;
+  height: 148px;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.75;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.32);
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+}
+.chain-log .l { white-space: pre-wrap; word-break: break-word; }
+.chain-log .l.ok { color: var(--accent); }
+.chain-log .l.warn { color: var(--warning); }
+.chain-log .l.err { color: var(--danger); }
+.chain-unlocked {
+  font-family: var(--font-mono);
+  font-size: clamp(20px, 6vw, 36px);
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 30px var(--accent-glow);
+}
+.bar.danger .fill { background: linear-gradient(90deg, #6b0a1a, var(--danger)); box-shadow: 0 0 14px var(--danger-glow); }
+
+/* mono glow accents for the granted screen */
+.granted-big {
+  font-family: var(--font-mono);
+  font-size: clamp(30px, 9vw, 58px);
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 40px var(--accent-glow);
+  line-height: 1.05;
+}

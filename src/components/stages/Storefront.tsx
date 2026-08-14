@@ -6,6 +6,7 @@ import { config } from '../../config'
 import TopBar from './TopBar'
 import ProductCard from './ProductCard'
 import ProductDetail from './ProductDetail'
+import GlitchText from '../ui/GlitchText'
 import { Check, ArrowRight, Sparkle } from '../ui/Icons'
 
 interface Props {
@@ -40,7 +41,7 @@ export default function Storefront({ onGetAccess }: Props) {
                 </span>
                 <span className="badge success">{config.accessLabel}</span>
               </div>
-              <h1>{heroTitle}</h1>
+              <GlitchText as="h1" text={heroTitle} intensity={0.07} />
               <p className="lede">{target.targetLines?.[0] ?? target.summary}</p>
 
               <div className="pill-row">

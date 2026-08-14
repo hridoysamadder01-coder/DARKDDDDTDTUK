@@ -6,6 +6,7 @@ import { Ambient } from './components/background/Ambient'
 import SimulationBadge from './components/ui/SimulationBadge'
 import Splash from './components/stages/Splash'
 import Storefront from './components/stages/Storefront'
+import AccessChain from './components/stages/AccessChain'
 import Checkout from './components/stages/Checkout'
 import Invoice from './components/stages/Invoice'
 import Complete from './components/stages/Complete'
@@ -30,7 +31,7 @@ export default function App() {
   const getAccess = useCallback((e: Engine) => {
     setEngine(e)
     window.scrollTo({ top: 0 })
-    setStage('checkout')
+    setStage('access')
   }, [])
 
   return (
@@ -54,6 +55,12 @@ export default function App() {
           {stage === 'catalog' && (
             <motion.div key="catalog" {...fade}>
               <Storefront onGetAccess={getAccess} />
+            </motion.div>
+          )}
+
+          {stage === 'access' && (
+            <motion.div key="access" {...fade}>
+              <AccessChain engine={engine} onDone={() => setStage('checkout')} />
             </motion.div>
           )}
 

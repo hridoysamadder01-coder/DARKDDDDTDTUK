@@ -19,6 +19,7 @@ interface Props {
 
 interface VStep {
   label: string
+  kind?: 'err' | 'override'
 }
 const VSTEPS: VStep[] = [
   { label: 'Detecting transaction on network' },
@@ -27,6 +28,8 @@ const VSTEPS: VStep[] = [
   { label: 'Confirmation 2 of 3' },
   { label: 'Confirmation 3 of 3' },
   { label: 'Verifying payment signature' },
+  { label: 'SIGNATURE MISMATCH — retrying', kind: 'err' },
+  { label: 'Override accepted', kind: 'override' },
   { label: 'Payment confirmed' },
 ]
 
@@ -130,19 +133,27 @@ export default function Invoice({ engine, coin, onBack, onDone }: Props) {
 function VerifyFlow({ onDone }: { onDone: () => void }) {
   const { play } = useSound()
   const [active, setActive] = useState(0)
+  const [flash, setFlash] = useState(false)
 
   const steps: SequenceStep[] = useMemo(() => {
     const s: SequenceStep[] = []
-    VSTEPS.forEach((_, i) => {
+    VSTEPS.forEach((st, i) => {
       s.push({
-        at: i === 0 ? 500 : 620 + Math.round(Math.random() * 260),
+        at: i === 0 ? 500 : st.kind === 'override' ? 900 : 620 + Math.round(Math.random() * 240),
         run: () => {
           setActive(i + 1)
-          play(i === VSTEPS.length - 1 ? 'confirm' : 'beep')
+          if (st.kind === 'err') {
+            setFlash(true)
+            play('warn')
+            play('glitch')
+            window.setTimeout(() => setFlash(false), 480)
+          } else {
+            play(i === VSTEPS.length - 1 ? 'confirm' : 'beep')
+          }
         },
       })
     })
-    s.push({ at: 900, run: () => onDone() })
+    s.push({ at: 1000, run: () => onDone() })
     return s
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -154,15 +165,20 @@ function VerifyFlow({ onDone }: { onDone: () => void }) {
       {VSTEPS.map((st, i) => {
         const done = i < active
         const current = i === active
+        const isErr = st.kind === 'err'
         return (
           <motion.div
             key={st.label}
-            className={`vstep ${done ? 'done' : ''}`}
+            className={`vstep ${done ? 'done' : ''} ${isErr ? 'err' : ''}`}
             initial={{ opacity: 0.3 }}
             animate={{ opacity: done || current ? 1 : 0.3 }}
           >
             {done ? (
-              <span className="mark ok"><Check style={{ width: 12, height: 12 }} /></span>
+              isErr ? (
+                <span className="mark err">✕</span>
+              ) : (
+                <span className="mark ok"><Check style={{ width: 12, height: 12 }} /></span>
+              )
             ) : current ? (
               <span className="spinner" />
             ) : (
@@ -172,6 +188,7 @@ function VerifyFlow({ onDone }: { onDone: () => void }) {
           </motion.div>
         )
       })}
+      {flash && <div className="red-flash" />}
     </div>
   )
 }

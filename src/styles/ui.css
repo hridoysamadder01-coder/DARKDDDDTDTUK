@@ -52,12 +52,12 @@
 
 .btn.primary {
   color: var(--accent-ink);
-  background: linear-gradient(180deg, var(--accent), #5566ee);
+  background: linear-gradient(180deg, var(--accent), #00cf86);
   border-color: transparent;
   box-shadow: var(--shadow-accent);
 }
 .btn.primary:hover {
-  background: linear-gradient(180deg, #7d8aff, var(--accent));
+  background: linear-gradient(180deg, #4dffc4, var(--accent));
   filter: brightness(1.03);
 }
 .btn.success {
@@ -172,7 +172,7 @@
   white-space: nowrap;
 }
 .badge .d { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.badge.accent { color: #b9c0ff; border-color: var(--accent-line); background: var(--accent-soft); }
+.badge.accent { color: #7dffcf; border-color: var(--accent-line); background: var(--accent-soft); }
 .badge.success { color: var(--success); border-color: rgba(47, 211, 154, 0.35); background: var(--success-soft); }
 .badge.warning { color: var(--warning); border-color: rgba(242, 179, 75, 0.35); background: var(--warning-soft); }
 .badge.danger { color: var(--danger); border-color: rgba(255, 92, 108, 0.35); background: var(--danger-soft); }

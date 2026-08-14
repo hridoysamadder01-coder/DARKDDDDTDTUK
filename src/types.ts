@@ -1,4 +1,4 @@
-export type Stage = 'splash' | 'catalog' | 'checkout' | 'invoice' | 'complete'
+export type Stage = 'splash' | 'catalog' | 'access' | 'checkout' | 'invoice' | 'complete'
 
 export type EngineStatus =
   | 'AVAILABLE // LIFETIME ACCESS'

@@ -4,9 +4,10 @@ import type { Engine } from '../../types'
 import { config } from '../../config'
 import { useSequence, type SequenceStep } from '../../hooks/useSequence'
 import { useSound } from '../../hooks/useSoundToggle'
-import { Check, CheckCircle, Sparkle } from '../ui/Icons'
+import { Check, Sparkle } from '../ui/Icons'
+import GlitchText from '../ui/GlitchText'
 
-type Phase = 'provisioning' | 'success' | 'reveal'
+type Phase = 'provisioning' | 'granted' | 'reveal'
 
 const PROV = [
   'Confirming payment',
@@ -37,8 +38,8 @@ export default function Complete({ engine, onRestart }: { engine: Engine; onRest
         },
       })
     })
-    s.push({ at: 700, run: () => { setPhase('success'); play('confirm') } })
-    s.push({ at: 2100, run: () => { setPhase('reveal'); play('whoosh') } })
+    s.push({ at: 700, run: () => { setPhase('granted'); play('confirm'); play('glitch') } })
+    s.push({ at: 2600, run: () => { setPhase('reveal'); play('whoosh') } })
     return s
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -83,20 +84,20 @@ export default function Complete({ engine, onRestart }: { engine: Engine; onRest
           </motion.div>
         )}
 
-        {phase === 'success' && (
+        {phase === 'granted' && (
           <motion.div
-            key="success"
+            key="granted"
             className="inner"
-            initial={{ opacity: 0, scale: 0.94 }}
+            initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 220, damping: 20 }}
+            transition={{ type: 'spring', stiffness: 220, damping: 18 }}
           >
-            <div className="success-emblem"><CheckCircle /></div>
-            <h2>Access activated</h2>
-            <div className="prod-line">{codename} · {variant}</div>
+            <div className="success-emblem"><Check style={{ width: 34, height: 34 }} /></div>
+            <GlitchText as="div" className="granted-big" text="ACCESS GRANTED" always intensity={0.3} />
+            <div className="prod-line mt16">{codename} · {variant}</div>
             <div className="lic">License key · <b>CE-OBSX-7X93-A11F-9K2V</b></div>
-            <div className="prov-sub mt16">Your build is ready to download.</div>
+            <div className="prov-sub mt16">Build unlocked · ready to download.</div>
           </motion.div>
         )}
 
