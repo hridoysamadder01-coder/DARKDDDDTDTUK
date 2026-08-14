@@ -37,10 +37,11 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Configure Pages (auto-enable on first run)
+      # Pages must be enabled once in Settings → Pages → Source: GitHub Actions.
+      # We do NOT use `enablement: true` because the default GITHUB_TOKEN cannot
+      # create a Pages site on this repo ("Resource not accessible by integration").
+      - name: Configure Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
