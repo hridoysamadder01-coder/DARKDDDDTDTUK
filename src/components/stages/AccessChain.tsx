@@ -76,7 +76,7 @@ export default function AccessChain({ engine, onDone }: { engine: Engine; onDone
       setPct(100)
       setHeadline('ACCESS LAYER UNLOCKED')
       play('confirm')
-      window.setTimeout(onDone, 1500)
+      // wait for the user to tap PROCEED — no auto-advance
     }
 
     const tl = gsap.timeline({ onComplete: finish, delay: 0.3 })
@@ -117,7 +117,10 @@ export default function AccessChain({ engine, onDone }: { engine: Engine; onDone
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Clicking during the run fast-forwards to the unlocked gate (still a manual
+  // step — the user must then tap PROCEED to continue).
   const skip = () => {
+    if (unlocked) return
     tlRef.current?.kill()
     if (doneRef.current) return
     doneRef.current = true
@@ -125,7 +128,6 @@ export default function AccessChain({ engine, onDone }: { engine: Engine; onDone
     setPct(100)
     setHeadline('ACCESS LAYER UNLOCKED')
     play('confirm')
-    window.setTimeout(onDone, 900)
   }
 
   const logRef = useRef<HTMLDivElement>(null)
@@ -169,6 +171,23 @@ export default function AccessChain({ engine, onDone }: { engine: Engine; onDone
             >
               <div className="pct">100%</div>
               <GlitchText as="div" className="unlocked" text="ACCESS LAYER UNLOCKED" always />
+              <motion.div
+                style={{ marginTop: 26 }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+              >
+                <button
+                  className="btn primary"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    play('whoosh')
+                    onDone()
+                  }}
+                >
+                  PROCEED ▸
+                </button>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

@@ -674,7 +674,7 @@
 .row-center { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
 .faded { opacity: 0.6; }
 
-/* ===================== CODE STREAM (WRITE BUILD) ===================== */
+/* ===================== CODE STREAM · BUILD CONSOLE ===================== */
 .codestream {
   position: relative;
   z-index: 12;
@@ -682,76 +682,125 @@
   flex-direction: column;
   min-height: 100dvh;
   height: 100dvh;
-  background: linear-gradient(180deg, rgba(4, 7, 10, 0.92), rgba(4, 7, 10, 0.86));
+  background: linear-gradient(180deg, rgba(4, 7, 10, 0.94), rgba(4, 7, 10, 0.88));
   font-family: var(--font-mono);
+  overflow: hidden;
 }
-.cs-head {
+
+/* top bar */
+.cs-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 16px;
+  padding: 9px 16px;
   border-bottom: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   flex-wrap: wrap;
 }
-.cs-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cs-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cs-brand b { font-size: 12px; letter-spacing: 0.16em; color: var(--green); font-weight: 700; }
+.cs-bid { font-size: 10.5px; color: var(--text-dim); letter-spacing: 0.06em; }
 .cs-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green-glow); flex: none; animation: pulseDot 1.4s ease-in-out infinite; }
 @keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.cs-title { font-size: 12px; letter-spacing: 0.18em; color: var(--green); font-weight: 700; flex: none; }
-.cs-file { font-size: 12px; color: var(--text-dim); letter-spacing: 0.04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cs-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.cs-stat { font-size: 11px; letter-spacing: 0.1em; color: var(--text-dim); white-space: nowrap; }
-.cs-stat b { color: var(--text); font-weight: 600; }
+.cs-tele { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.cs-tele > span { font-size: 11px; letter-spacing: 0.08em; color: var(--text-dim); white-space: nowrap; }
+.cs-tele b { color: var(--text); font-weight: 600; }
 .cs-stop {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  color: var(--red);
-  border: 1px solid var(--red-glow);
-  padding: 6px 12px;
-  border-radius: 3px;
-  background: rgba(214, 67, 79, 0.06);
-  transition: all 0.16s ease;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  color: var(--red); border: 1px solid var(--red-glow); padding: 6px 12px; border-radius: 3px;
+  background: rgba(214, 67, 79, 0.06); transition: all 0.16s ease;
 }
 .cs-stop:hover { background: var(--red); color: #14060a; }
 
+/* main split */
+.cs-main { flex: 1; display: grid; grid-template-columns: 246px 1fr; min-height: 0; }
+@media (max-width: 760px) { .cs-main { grid-template-columns: 1fr; } }
+
+/* build tree sidebar */
+.cs-tree {
+  display: flex; flex-direction: column; min-height: 0;
+  border-right: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+}
+@media (max-width: 760px) { .cs-tree { display: none; } }
+.cs-tree-h {
+  padding: 10px 14px; font-size: 10.5px; letter-spacing: 0.2em; color: var(--text-dim);
+  border-bottom: 1px solid var(--line); text-transform: uppercase;
+}
+.cs-tree-list { flex: 1; overflow: hidden; padding: 8px 8px; display: flex; flex-direction: column; gap: 2px; }
+.cs-tree-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 3px; font-size: 11.5px; }
+.cs-tree-item .cs-tree-ic { flex: none; width: 12px; text-align: center; }
+.cs-tree-item .cs-tree-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-tree-item.done { color: var(--text-dim); }
+.cs-tree-item.done .cs-tree-ic { color: var(--green); }
+.cs-tree-item.active { color: var(--text); background: rgba(69, 207, 146, 0.06); }
+.cs-tree-item.active .cs-tree-ic { color: var(--green); }
+.cs-tree-foot { border-top: 1px solid var(--line); padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+.cs-kv { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; }
+.cs-kv span { color: var(--text-dim); letter-spacing: 0.1em; }
+.cs-kv b { color: var(--green); font-weight: 600; }
+
+/* editor */
+.cs-editor { display: flex; flex-direction: column; min-height: 0; }
+.cs-tabbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 16px; border-bottom: 1px solid var(--line); background: rgba(0, 0, 0, 0.3);
+}
+.cs-tab { font-size: 12px; color: var(--text); letter-spacing: 0.04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-tab::before { content: '▸ '; color: var(--green); }
+.cs-compiling { font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; white-space: nowrap; }
+.cs-compiling b { color: var(--green); }
 .cs-bar { height: 2px; background: rgba(69, 207, 146, 0.08); overflow: hidden; }
 .cs-fill { height: 100%; background: linear-gradient(90deg, var(--green-deep), var(--green)); transition: width 0.15s linear; }
 
 .cs-body {
-  flex: 1;
-  overflow: hidden;
-  padding: 14px 16px 8px;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: var(--text);
-  mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 100%);
+  flex: 1; overflow: hidden; padding: 14px 16px 8px;
+  font-size: 12.5px; line-height: 1.6; color: var(--text);
+  mask-image: linear-gradient(to bottom, transparent, #000 5%, #000 100%);
 }
 @media (max-width: 640px) { .cs-body { font-size: 11px; padding: 10px 10px 6px; } }
-.cs-line { display: flex; gap: 12px; white-space: pre; }
+.cs-line { display: flex; gap: 12px; }
 .cs-line code { font-family: var(--font-mono); white-space: pre-wrap; word-break: break-word; }
 .cs-ln { color: var(--green-deep); flex: none; user-select: none; font-size: 11px; padding-top: 1px; min-width: 2.4em; text-align: right; }
+.cs-active { background: rgba(69, 207, 146, 0.045); border-radius: 2px; }
 .cs-active code { color: var(--text); }
 .cs-caret { display: inline-block; width: 7px; height: 1em; margin-left: 1px; background: var(--green); vertical-align: text-bottom; opacity: 0.85; animation: blink 1.1s steps(1) infinite; }
 
-/* syntax tones (graded) */
 .cs-body .c-kw { color: var(--green); }
 .cs-body .c-str { color: var(--amber); }
 .cs-body .c-num { color: #6fd3c0; }
-.cs-body .c-com { color: var(--text-dim); opacity: 0.8; }
+.cs-body .c-com { color: var(--text-dim); opacity: 0.85; }
 .cs-body .c-log { color: #6fd3c0; }
 .cs-body .c-warn { color: var(--amber); }
 
-.cs-foot {
-  padding: 8px 16px;
-  border-top: 1px solid var(--line);
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  background: rgba(0, 0, 0, 0.4);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.cs-status {
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  padding: 8px 16px; border-top: 1px solid var(--line);
+  font-size: 10.5px; letter-spacing: 0.1em; color: var(--text-dim);
+  text-transform: uppercase; background: rgba(0, 0, 0, 0.4);
 }
+.cs-status b { color: var(--text); }
+.cs-status-tgt { margin-left: auto; color: var(--green); }
+@media (max-width: 640px) { .cs-status { gap: 10px; font-size: 9.5px; } .cs-status-tgt { margin-left: 0; } }
+
+/* payment link (non-functional, decorative, bilingual) */
+.paylink {
+  margin: 6px 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgba(69, 207, 146, 0.03);
+  text-align: left;
+}
+.paylink-h { font-size: 10px; letter-spacing: 0.12em; color: var(--text-dim); margin-bottom: 7px; }
+.paylink-row { display: flex; align-items: center; gap: 8px; }
+.paylink-url { flex: 1; font-family: var(--font-mono); font-size: 12px; color: var(--green); word-break: break-all; letter-spacing: 0.02em; }
+.paylink-btn {
+  flex: none; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em;
+  color: #001b10; background: var(--green); border-radius: 3px; padding: 7px 12px; transition: all 0.16s ease;
+}
+.paylink-btn:hover { box-shadow: 0 0 14px var(--green-glow); }
+.paylink-btn:disabled { opacity: 0.55; pointer-events: none; }
+.paylink-msg { margin-top: 7px; font-size: 10px; letter-spacing: 0.06em; color: var(--text-dim); }
+.paylink-msg.busy { color: var(--amber); }

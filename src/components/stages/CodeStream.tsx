@@ -1,11 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useSound } from '../../hooks/useSoundToggle'
-import { makeBuildFile, type BuildFile } from '../../lib/codegen'
+import { makeBuildFile, hx, type BuildFile } from '../../lib/codegen'
+import { config } from '../../config'
 
 interface Row {
   id: number
   html: string
+}
+interface TreeItem {
+  name: string
+  done: boolean
 }
 
 const esc = (s: string) =>
@@ -40,26 +45,28 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
   const [fileName, setFileName] = useState('core/vision.pipeline.ts')
   const [pct, setPct] = useState(0)
   const [lineCount, setLineCount] = useState(0)
+  const [bytes, setBytes] = useState(0)
   const [elapsed, setElapsed] = useState(0)
+  const [thru, setThru] = useState(96)
+  const [cksum, setCksum] = useState(() => hx(8))
   const [mod, setMod] = useState('vision')
+  const [tree, setTree] = useState<TreeItem[]>([{ name: 'core/vision.pipeline.ts', done: false }])
   const [black, setBlack] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
+  const t0 = useRef(Date.now())
 
-  const start = useMemo(() => Date.now, [])
-
-  // elapsed clock (uses render time diff, no forbidden Date in workflow — this is app runtime)
   useEffect(() => {
-    const t0 = start()
-    const iv = window.setInterval(() => setElapsed(Math.floor((start() - t0) / 1000)), 1000)
+    const iv = window.setInterval(() => setElapsed(Math.floor((Date.now() - t0.current) / 1000)), 1000)
     return () => window.clearInterval(iv)
-  }, [start])
-
+  }, [])
   useEffect(() => {
-    const mv = window.setInterval(() => setMod(MODULES[Math.floor(Math.random() * MODULES.length)]), 700)
-    return () => window.clearInterval(mv)
+    const iv = window.setInterval(() => {
+      setThru(60 + Math.floor(Math.random() * 140))
+      setMod(MODULES[Math.floor(Math.random() * MODULES.length)])
+    }, 600)
+    return () => window.clearInterval(iv)
   }, [])
 
-  // typing engine
   useEffect(() => {
     let id = 0
     let fileIdx = 0
@@ -72,9 +79,10 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
     const commit = (line: string) => {
       const html = highlight(line)
       setRows((prev) => {
-        const next = prev.length > 150 ? prev.slice(prev.length - 150) : prev
+        const next = prev.length > 130 ? prev.slice(prev.length - 130) : prev
         return [...next, { id: id++, html }]
       })
+      setBytes((b) => b + line.length + 1)
     }
 
     const iv = window.setInterval(() => {
@@ -91,16 +99,22 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
         setPct(Math.min(99, Math.round((lineIdx / cur.lines.length) * 100)))
         if (++sinceKey % 3 === 0) play('key')
         if (lineIdx >= cur.lines.length) {
-          // next file → brief black cut (multi-screen feel)
+          // seal file → next (multi-screen black cut)
           setBlack(true)
           play('glitch')
-          window.setTimeout(() => setBlack(false), 190)
-          fileIdx += 1
-          cur = makeBuildFile(fileIdx)
-          lineIdx = 0
-          charPos = 0
-          setFileName(cur.name)
-          setPct(0)
+          window.setTimeout(() => setBlack(false), 180)
+          setCksum(hx(8))
+          setTree((t) => {
+            const marked = t.map((x, i) => (i === t.length - 1 ? { ...x, done: true } : x))
+            fileIdx += 1
+            cur = makeBuildFile(fileIdx)
+            lineIdx = 0
+            charPos = 0
+            setFileName(cur.name)
+            setPct(0)
+            const next = [...marked, { name: cur.name, done: false }]
+            return next.length > 9 ? next.slice(next.length - 9) : next
+          })
         }
       }
     }, 22)
@@ -109,7 +123,6 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // auto-scroll to newest
   useEffect(() => {
     const el = bodyRef.current
     if (el) el.scrollTop = el.scrollHeight
@@ -117,6 +130,8 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
 
   const mm = String(Math.floor(elapsed / 60)).padStart(2, '0')
   const ss = String(elapsed % 60).padStart(2, '0')
+  const kb = bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(1)} KB`
+  const short = fileName.split('/').pop()
 
   return (
     <motion.div
@@ -125,41 +140,68 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="cs-head">
-        <div className="cs-left">
+      <div className="cs-topbar">
+        <div className="cs-brand">
           <span className="cs-dot" />
-          <span className="cs-title">WRITING BUILD</span>
-          <span className="cs-file">{fileName}</span>
+          <b>CORE BUILD ENGINE</b>
+          <span className="cs-bid">BUILD 0x{cksum}</span>
         </div>
-        <div className="cs-right">
-          <span className="cs-stat">MOD <b>{mod}</b></span>
-          <span className="cs-stat">COMPILING <b>{pct}%</b></span>
-          <span className="cs-stat">LINES <b>{lineCount.toLocaleString()}</b></span>
-          <span className="cs-stat">{mm}:{ss}</span>
+        <div className="cs-tele">
+          <span>{config.targetCodename}</span>
+          <span>THROUGHPUT <b>{thru} MB/s</b></span>
+          <span>{mm}:{ss}</span>
           <button className="cs-stop" onClick={onExit}>■ STOP</button>
         </div>
       </div>
 
-      <div className="cs-bar"><div className="cs-fill" style={{ width: `${pct}%` }} /></div>
-
-      <div className="cs-body" ref={bodyRef}>
-        {rows.map((r, i) => (
-          <div className="cs-line" key={r.id}>
-            <span className="cs-ln">{String(i + 1).padStart(3, '0')}</span>
-            <code dangerouslySetInnerHTML={{ __html: r.html || '&nbsp;' }} />
+      <div className="cs-main">
+        <aside className="cs-tree">
+          <div className="cs-tree-h">BUILD TREE</div>
+          <div className="cs-tree-list">
+            {tree.map((f, i) => (
+              <div key={i} className={`cs-tree-item ${f.done ? 'done' : 'active'}`}>
+                <span className="cs-tree-ic">{f.done ? '✓' : '›'}</span>
+                <span className="cs-tree-nm">{f.name}</span>
+              </div>
+            ))}
           </div>
-        ))}
-        <div className="cs-line cs-active">
-          <span className="cs-ln">{String(rows.length + 1).padStart(3, '0')}</span>
-          <code>
-            {typing}
-            <span className="cs-caret" />
-          </code>
-        </div>
-      </div>
+          <div className="cs-tree-foot">
+            <div className="cs-kv"><span>MODULE</span><b>{mod}</b></div>
+            <div className="cs-kv"><span>WRITTEN</span><b>{kb}</b></div>
+            <div className="cs-kv"><span>LINES</span><b>{lineCount.toLocaleString()}</b></div>
+            <div className="cs-kv"><span>CKSUM</span><b>0x{cksum.slice(0, 6)}</b></div>
+          </div>
+        </aside>
 
-      <div className="cs-foot">
-        WRITING {fileName.split('/').pop()} · CROSS-MODEL VISION CORE · {mm}:{ss}
+        <section className="cs-editor">
+          <div className="cs-tabbar">
+            <span className="cs-tab">{fileName}</span>
+            <span className="cs-compiling">COMPILING <b>{pct}%</b></span>
+          </div>
+          <div className="cs-bar"><div className="cs-fill" style={{ width: `${pct}%` }} /></div>
+          <div className="cs-body" ref={bodyRef}>
+            {rows.map((r, i) => (
+              <div className="cs-line" key={r.id}>
+                <span className="cs-ln">{String(i + 1).padStart(3, '0')}</span>
+                <code dangerouslySetInnerHTML={{ __html: r.html || '&nbsp;' }} />
+              </div>
+            ))}
+            <div className="cs-line cs-active">
+              <span className="cs-ln">{String(rows.length + 1).padStart(3, '0')}</span>
+              <code>
+                {typing}
+                <span className="cs-caret" />
+              </code>
+            </div>
+          </div>
+          <div className="cs-status">
+            <span>WRITING <b>{short}</b></span>
+            <span>{lineCount.toLocaleString()} LINES</span>
+            <span>{kb}</span>
+            <span>{thru} MB/s</span>
+            <span className="cs-status-tgt">TARGET · ANDROID + IPHONE</span>
+          </div>
+        </section>
       </div>
 
       {black && <div className="black-cut" />}

@@ -21,14 +21,30 @@ const REFS = ['SESSION-X93-A11', 'VAULT-CORE-72', 'NODE-ACCESS-440']
 export default function CryptoSession({ engine, coin, onBack, onDone }: Props) {
   const { play } = useSound()
   const [verifying, setVerifying] = useState(false)
+  const [linkBusy, setLinkBusy] = useState(false)
+  const [linkMsg, setLinkMsg] = useState('轻触打开支付 · TAP TO OPEN PAYMENT')
   const { remaining, label } = useCountdown(config.countdownSeconds)
 
   const rows: Array<[string, string, 'green' | 'amber' | 'red' | undefined]> = [
-    ['ASSET', `${coin.sym} · ${coin.name}`, 'green'],
-    ['AMOUNT', `$${engine.price} ${config.currency}`, undefined],
-    ['ACCESS CLASS', config.accessLabel, 'amber'],
-    ['STATUS', 'WAITING FOR ACCESS CONFIRMATION', 'amber'],
+    ['资产 · ASSET', `${coin.sym} · ${coin.name}`, 'green'],
+    ['金额 · AMOUNT', `$${engine.price} ${config.currency}`, undefined],
+    ['访问 · ACCESS', config.accessLabel, 'amber'],
+    ['状态 · STATUS', '等待确认 · WAITING FOR CONFIRMATION', 'amber'],
   ]
+
+  // The payment link is intentionally non-functional — tapping it does nothing
+  // real. It exists only to look convincing inside the simulation.
+  const openPay = () => {
+    if (linkBusy) return
+    play('key')
+    setLinkBusy(true)
+    setLinkMsg('正在连接支付节点… · CONNECTING TO NODE…')
+    window.setTimeout(() => {
+      setLinkBusy(false)
+      setLinkMsg('链接不可用 · LINK UNAVAILABLE · 无真实交易')
+      play('warn')
+    }, 1150)
+  }
 
   return (
     <div className="cine">
@@ -39,7 +55,7 @@ export default function CryptoSession({ engine, coin, onBack, onDone }: Props) {
         transition={{ type: 'spring', stiffness: 240, damping: 22 }}
       >
         <div className="bar">
-          <span className="title">ACCESS SESSION</span>
+          <span className="title">安全访问会话 · SECURE ACCESS</span>
           <span className="chip green">{coin.sym}</span>
         </div>
 
@@ -81,12 +97,23 @@ export default function CryptoSession({ engine, coin, onBack, onDone }: Props) {
                   ))}
                 </div>
                 <div style={{ fontSize: 10, marginTop: 8, letterSpacing: '0.14em' }} className="faded">
-                  SYNTHETIC REFERENCE
+                  合成引用 · SYNTHETIC REFERENCE
                 </div>
               </div>
 
+              <div className="paylink">
+                <div className="paylink-h">支付链接 · PAYMENT LINK</div>
+                <div className="paylink-row">
+                  <span className="paylink-url">pay.corevault-sim.net/s/{REFS[0].toLowerCase()}</span>
+                  <button className="paylink-btn" onClick={openPay} disabled={linkBusy}>
+                    {linkBusy ? '验证中…' : '打开 · OPEN'} ▸
+                  </button>
+                </div>
+                <div className={`paylink-msg ${linkBusy ? 'busy' : ''}`}>{linkMsg}</div>
+              </div>
+
               <div className={`timer ${remaining < 60 ? 'low' : ''}`}>
-                SESSION EXPIRES IN {label}
+                会话到期 · EXPIRES IN {label}
                 {config.bilingualLabels ? ` · ${zh.verifying}` : ''}
               </div>
             </>
@@ -113,8 +140,8 @@ export default function CryptoSession({ engine, coin, onBack, onDone }: Props) {
         </div>
       </motion.div>
 
-      <div className="faded mt16" style={{ maxWidth: 460, textAlign: 'center', fontSize: 11, letterSpacing: '0.18em' }}>
-        {config.financialNotice}
+      <div className="faded mt16" style={{ maxWidth: 460, textAlign: 'center', fontSize: 11, letterSpacing: '0.16em' }}>
+        无真实交易 · {config.financialNotice}
       </div>
     </div>
   )

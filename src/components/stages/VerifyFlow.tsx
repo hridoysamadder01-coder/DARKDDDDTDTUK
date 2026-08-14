@@ -77,7 +77,7 @@ export default function VerifyFlow({ onDone }: { onDone: () => void }) {
         play('confirm')
       },
     })
-    s.push({ at: 1300, run: () => onDone() })
+    // no auto-advance — the user taps CONTINUE
     return s
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -120,6 +120,20 @@ export default function VerifyFlow({ onDone }: { onDone: () => void }) {
       <div className="verify-log panel">
         <TerminalLog lines={logs} />
       </div>
+
+      {authed && (
+        <motion.div
+          className="row-center"
+          style={{ marginTop: 16 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          <button className="btn primary" onClick={() => { play('whoosh'); onDone() }}>
+            CONTINUE ▸
+          </button>
+        </motion.div>
+      )}
 
       {flash && <div className="red-flash" />}
       {black && <div className="black-cut" />}
