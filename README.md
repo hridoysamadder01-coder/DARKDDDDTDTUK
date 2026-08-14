@@ -1,13 +1,13 @@
-# CORE ENGINE ACCESS TERMINAL
+# Core Engine — a cinematic prank storefront
 
-> A cinematic **prank** website with an underground hacker-market aesthetic.
+> A **prank** website disguised as a premium software-distribution product.
 > **100% simulation. Frontend-only. Completely harmless.**
 
-Boot into a "restricted underground engine marketplace", browse fictional
-software builds, trigger a dramatic multi-layer "access chain", watch a
-theatrical price + payment simulation, and get hit with the punchline:
+It looks like a real, modern dark product UI — a private "build marketplace"
+with a featured product, a real-feeling checkout, a crypto payment page, and a
+provisioning + success flow — then reveals the punchline:
 
-> **PRANK SUCCESS 😈 — YOU JUST ENTERED A SIMULATION.**
+> **It was a simulation. You just got pranked — nothing here was real.**
 
 A persistent **`SIMULATION // PRANK ENVIRONMENT`** label is always on screen.
 
@@ -22,27 +22,30 @@ This is a visual prank only. It contains **no** real functionality of any kind:
 - ❌ no seed-phrase / password / credential collection, no login capture, no phishing
 - ❌ no personal-data collection, IP harvesting, device fingerprinting, or tracking
 - ❌ no backend, no database, no network requests to any third party
+- ❌ no impersonation of any real brand (the store, products, and coins are fictional)
 
-Every "payment", "verification", "network", and "authorization" moment is pure
-front-end theatre driven by timers and animation. Nothing is ever sent, stored,
-or charged. Session-reference labels (e.g. `SIM-REF-X93-7A11`) are intentionally
-fake formats, marked `DEMO QR // NON-PAYABLE`.
-
-### Flow
-
-`boot → terminal + 15-build marketplace → detail panel → OBSIDIAN CORE X access
-chain → price reveal ($430 · LIFETIME ACCESS) → SELECT CRYPTO ASSET
-(BTC · SOL · ETH · USDT · LTC · XRP) → fake crypto session → fake verification →
-ACCESS GRANTED → PRANK SUCCESS 😈`
+Every "payment", "verification", and "provisioning" moment is pure front-end
+theatre driven by timers and animation. Nothing is ever sent, stored, or
+charged. The payment address is an intentionally fake, clearly-marked demo
+string (`Demo address — not a real wallet`), and the QR is labelled
+`DEMO QR — NON-PAYABLE`.
 
 ---
+
+## 🧭 Flow
+
+`splash → storefront (featured build + 15-product catalog) → product detail →
+checkout (order summary + choose crypto currency) → crypto payment page
+(amount, network, demo QR, demo address, countdown) → "I've paid → verify" →
+verification → provisioning → "Access activated" → It was a simulation.`
 
 ## 🧰 Stack
 
 - **React 18 + Vite 5 + TypeScript** (strict)
-- **Framer Motion** for stage transitions & cinematic timelines
-- **HTML5 Canvas** for the matrix code-rain and network-map layers
-- **Web Audio API** for synthesised sound (no audio files, nothing autoplays)
+- **Framer Motion** for stage transitions & micro-interactions
+- **CSS design system** — modern dark product UI (ambient gradient background,
+  system sans-serif, mono for figures), no images required
+- **Web Audio API** for subtle UI sound (no audio files, nothing autoplays)
 
 ## 🚀 Run locally
 
@@ -55,21 +58,11 @@ npm run preview    # preview the production build
 
 ## 🎛️ Configuration
 
-All the knobs live in [`src/config.ts`](src/config.ts):
-
-| Setting | Default |
-| --- | --- |
-| `targetProductName` | `OBSIDIAN CORE X // UNIVERSAL NATIVE BUILD` |
-| `price` / `currency` | `430` / `USD` |
-| `finalPrankMessage` | `PRANK SUCCESS 😈` |
-| `soundEnabledByDefault` | `false` |
-| `animationIntensity` | `high` \| `medium` \| `low` |
-| `bootDurationMs` | `6000` |
-| `countdownSeconds` | `899` (14:59) |
-| `supportedPlatforms` | Android / iPhone / Tablet / Universal |
-| `bilingualLabels` | `true` (small Chinese atmosphere labels) |
-
-The engine/build directory lives in [`src/data/engines.ts`](src/data/engines.ts).
+All the main knobs live in [`src/config.ts`](src/config.ts) — brand name,
+price, access label, the final reveal copy, splash duration, payment countdown,
+sound default, and the persistent simulation label. The product catalog lives
+in [`src/data/engines.ts`](src/data/engines.ts) and the payment currencies in
+[`src/data/coins.ts`](src/data/coins.ts).
 
 ## 🌐 Deployment
 
@@ -77,19 +70,17 @@ The engine/build directory lives in [`src/data/engines.ts`](src/data/engines.ts)
 
 Pushing to the deployment branch runs
 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which builds and
-publishes to GitHub Pages automatically (it also self-enables Pages on first
-run). Live URL:
+publishes to GitHub Pages. Live URL:
 
 **https://hridoysamadder01-coder.github.io/DARKDDDDTDTUK/**
 
-> If the first Actions run cannot auto-enable Pages, open
-> **Settings → Pages → Build and deployment → Source: GitHub Actions**, then
-> re-run the workflow.
+> The repo must be **public** and Pages **Source** set to **GitHub Actions**
+> (Settings → Pages). After that, every push deploys automatically.
 
 ### Vercel / Netlify / Render (static)
 
-Build served from `dist/`. Because those hosts serve from the site root, build
-with a root base path:
+Served from `dist/`. Because those hosts serve from the site root, build with a
+root base path:
 
 ```bash
 VITE_BASE=/ npm run build

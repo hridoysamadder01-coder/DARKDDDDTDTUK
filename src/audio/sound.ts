@@ -27,7 +27,7 @@ class SoundEngine {
       if (!AC) return null
       this.ctx = new AC()
       this.master = this.ctx.createGain()
-      this.master.gain.value = 0.32
+      this.master.gain.value = 0.22
       this.master.connect(this.ctx.destination)
     }
     if (this.ctx.state === 'suspended') void this.ctx.resume()
@@ -83,19 +83,19 @@ class SoundEngine {
     if (!ctx || !this.master) return
     switch (name) {
       case 'key':
-        return this.blip(ctx, 620 + Math.random() * 240, 0.012, 'square', 0.09)
+        return this.blip(ctx, 520 + Math.random() * 120, 0.02, 'sine', 0.05)
       case 'beep':
-        return this.blip(ctx, 880, 0.09, 'square', 0.14)
+        return this.blip(ctx, 660, 0.05, 'sine', 0.07)
       case 'warn':
-        return this.sweep(ctx, 320, 180, 0.28, 'sawtooth', 0.16)
+        return this.blip(ctx, 300, 0.12, 'triangle', 0.08)
       case 'glitch':
-        return this.noiseBurst(ctx, 0.14, 0.18)
+        return this.noiseBurst(ctx, 0.08, 0.05)
       case 'confirm':
-        this.sweep(ctx, 440, 880, 0.18, 'triangle', 0.16)
-        window.setTimeout(() => this.blip(ctx, 1180, 0.14, 'sine', 0.14), 140)
+        this.blip(ctx, 620, 0.09, 'sine', 0.09)
+        window.setTimeout(() => this.blip(ctx, 940, 0.16, 'sine', 0.09), 110)
         return
       case 'whoosh':
-        return this.sweep(ctx, 140, 900, 0.5, 'sine', 0.1)
+        return this.sweep(ctx, 220, 620, 0.3, 'sine', 0.05)
       case 'hum':
         return
     }

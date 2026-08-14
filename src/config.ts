@@ -11,36 +11,36 @@
 export type AnimationIntensity = 'low' | 'medium' | 'high'
 
 export interface AppConfig {
+  /** Product/platform brand shown in the nav + splash. */
+  brandName: string
+  brandTagline: string
+
   /** Primary target product name shown on the hero card. */
   targetProductName: string
-  /** Short target codename used in headings. */
   targetCodename: string
+
   /** Headline access price of the primary target (numeric, no symbol). */
   price: number
-  /** Currency label shown after the price. */
   currency: string
   /** Access-model label shown under the price and on cards. */
   accessLabel: string
 
-  /** Final prank punchline. */
+  /** Final reveal copy. */
   finalPrankMessage: string
   finalPrankSubtitle: string
   finalPrankNote: string
 
-  /** Sound on by default? (Browsers still require a user gesture.) */
   soundEnabledByDefault: boolean
-  /** Global animation intensity. */
   animationIntensity: AnimationIntensity
 
-  /** Boot sequence duration hint in ms (used for pacing). */
+  /** Splash duration hint in ms (used for pacing). */
   bootDurationMs: number
   /** Fake payment countdown, in seconds. */
   countdownSeconds: number
 
-  /** Supported platform tags. */
   supportedPlatforms: string[]
 
-  /** Show the small Chinese atmosphere labels? */
+  /** Show the small Chinese atmosphere labels? (off for the clean product look) */
   bilingualLabels: boolean
 
   /** The persistent, always-visible safety label. */
@@ -48,30 +48,35 @@ export interface AppConfig {
 }
 
 export const config: AppConfig = {
-  targetProductName: 'OBSIDIAN CORE X // UNIVERSAL NATIVE BUILD',
-  targetCodename: 'OBSIDIAN CORE X',
+  brandName: 'Core Engine',
+  brandTagline: 'Private Build Distribution',
+
+  targetProductName: 'Obsidian Core X — Universal Native Build',
+  targetCodename: 'Obsidian Core X',
+
   price: 430,
   currency: 'USD',
-  accessLabel: 'LIFETIME ACCESS',
+  accessLabel: 'Lifetime access',
 
-  finalPrankMessage: 'PRANK SUCCESS 😈',
-  finalPrankSubtitle: 'YOU JUST ENTERED A SIMULATION.',
-  finalPrankNote: 'No real payment. No real access. Just a cinematic prank environment.',
+  finalPrankMessage: 'It was a simulation.',
+  finalPrankSubtitle: 'You just got pranked — nothing here was real.',
+  finalPrankNote:
+    'No payment was taken, no wallet was touched, and no software was delivered. Every price, address, and confirmation you saw was a front-end mock built purely for the prank.',
 
   soundEnabledByDefault: false,
   animationIntensity: 'high',
 
-  bootDurationMs: 6000,
+  bootDurationMs: 3200,
   countdownSeconds: 899, // 14:59
 
-  supportedPlatforms: ['ANDROID', 'IPHONE', 'TABLET', 'UNIVERSAL'],
+  supportedPlatforms: ['Android', 'iPhone', 'Tablet', 'Universal'],
 
-  bilingualLabels: true,
+  bilingualLabels: false,
 
   simulationLabel: 'SIMULATION // PRANK ENVIRONMENT',
 }
 
-/** Small Chinese atmosphere labels (used sparingly for flavour). */
+/** Small Chinese atmosphere labels (optional flavour). */
 export const zh = {
   coreEngine: '核心引擎',
   encrypted: '已加密',
@@ -82,7 +87,6 @@ export const zh = {
   connected: '已连接',
 } as const
 
-/** Intensity → tuning multipliers used across canvases & timings. */
 export const intensityProfile: Record<
   AnimationIntensity,
   { rainDensity: number; nodes: number; glitchRate: number; flicker: number }
