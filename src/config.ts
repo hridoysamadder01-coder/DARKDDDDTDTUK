@@ -58,6 +58,15 @@ export interface AppConfig {
     }
   }
 
+  /** Opening narration for the final code-writing screen. */
+  codeStream: {
+    prepTitle: string
+    prepSub: string
+    voice: { rate: number; pitch: number }
+    /** First line is the "please wait" intro; the rest is the slow brief. */
+    narration: string[]
+  }
+
   /** Copy + robot lines for the payment-confirmation camera gate. */
   payVerify: {
     kicker: string
@@ -111,6 +120,22 @@ export const config: AppConfig = {
         'THE MOST POWERFUL ENGINE IN THE INDEX — RESERVED FOR YOU',
       ],
     },
+  },
+
+  codeStream: {
+    prepTitle: 'PREPARING YOUR ENGINE CODE',
+    prepSub: 'PLEASE WAIT',
+    // Very slow and deep — a measured, deliberate delivery.
+    voice: { rate: 0.5, pitch: 0.26 },
+    narration: [
+      'YOUR ENGINE CODE IS BEING PREPARED. PLEASE WAIT.',
+      'THIS CODE IS COMPATIBLE WITH ANY GOOGLE MODEL, INCLUDING GEMINI.',
+      'THEIR API COST WILL BE ONLY A LITTLE ABOVE ZERO.',
+      'EVERYTHING ELSE RUNS ON YOUR OWN LOCAL MODELS.',
+      'LIFETIME PREMIUM ACCESS.',
+      'THIS ENGINE WILL WORK WHEREVER YOU DEPLOY IT.',
+      'AND NOT MERELY WORK — IT IS THE MOST ADVANCED ENGINE WE CURRENTLY HOLD.',
+    ],
   },
 
   payVerify: {

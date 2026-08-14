@@ -57,55 +57,100 @@ export default function PriceReveal({ engine, onSelect }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const detail: Array<[string, string]> = [
+    ['BUILD', engine.buildClass],
+    ['ACCESS CLASS', engine.accessClass],
+    ['CLEARANCE', engine.securityLayer],
+    ['TARGET', engine.platform],
+  ]
+
   return (
     <div className="cine price">
       <div className="inner">
-        {phase === 'calc' && (
-          <motion.div
-            className="calc"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 1.2, repeat: Infinity }}
-          >
-            CALCULATING ACCESS CLASS...
-          </motion.div>
-        )}
+        <motion.div
+          className="checkout panel framed"
+          initial={{ opacity: 0, y: 22, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 220, damping: 24 }}
+        >
+          <div className="checkout-bar">
+            <span className="checkout-title">{shortName} // SECURE CHECKOUT</span>
+            <span className={`chip ${phase === 'final' ? 'green' : 'amber'}`}>
+              {phase === 'final' ? 'ACCESS UNLOCKED' : 'CALCULATING'}
+            </span>
+          </div>
 
-        {phase !== 'calc' && (
-          <>
-            <div className="calc faded" style={{ marginBottom: 4 }}>
-              {shortName} // ACCESS CLASS
-            </div>
-            <AnimatePresence mode="popLayout">
+          <div className="checkout-body">
+            {phase === 'calc' && (
               <motion.div
-                key={`${phase}-${display}`}
-                className={`ladder ${phase === 'final' ? 'final' : ''}`}
-                initial={{ opacity: 0, y: phase === 'final' ? 0 : 6, scale: phase === 'final' ? 0.7 : 1 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: phase === 'final' ? 0.4 : 0.12 }}
+                className="calc"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 1.2, repeat: Infinity }}
               >
-                {phase === 'final' ? (
-                  <GlitchText text={`$${engine.price} ${config.currency}`} always intensity={0.3} />
-                ) : (
-                  `$${display}`
-                )}
+                CALCULATING ACCESS CLASS...
               </motion.div>
-            </AnimatePresence>
+            )}
+
+            {phase !== 'calc' && (
+              <>
+                <div className="calc faded" style={{ marginBottom: 4 }}>
+                  {shortName} // ACCESS CLASS
+                </div>
+                <AnimatePresence mode="popLayout">
+                  <motion.div
+                    key={`${phase}-${display}`}
+                    className={`ladder ${phase === 'final' ? 'final' : ''}`}
+                    initial={{ opacity: 0, y: phase === 'final' ? 0 : 6, scale: phase === 'final' ? 0.7 : 1 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: phase === 'final' ? 0.4 : 0.12 }}
+                  >
+                    {phase === 'final' ? (
+                      <GlitchText text={`$${engine.price} ${config.currency}`} always intensity={0.3} />
+                    ) : (
+                      `$${display}`
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+
+                {phase === 'final' && (
+                  <motion.div
+                    className="final-sub"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.25 }}
+                  >
+                    {config.accessLabel}
+                  </motion.div>
+                )}
+              </>
+            )}
 
             {phase === 'final' && (
               <motion.div
-                className="final-sub"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.25 }}
+                className="checkout-detail"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.32 }}
               >
-                {config.accessLabel}
+                {detail.map(([k, v]) => (
+                  <div className="checkout-kv" key={k}>
+                    <span className="k">{k}</span>
+                    <span className="v">{v}</span>
+                  </div>
+                ))}
               </motion.div>
             )}
-          </>
-        )}
 
-        {phase === 'final' && <CryptoSelect onSelect={onSelect} />}
+            {phase === 'final' && (
+              <div className="checkout-sep">
+                <span>SETTLEMENT</span>
+              </div>
+            )}
+
+            {phase === 'final' && <CryptoSelect onSelect={onSelect} />}
+          </div>
+        </motion.div>
       </div>
     </div>
   )

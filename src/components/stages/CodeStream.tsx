@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useSound } from '../../hooks/useSoundToggle'
 import { makeBuildFile, hx, type BuildFile } from '../../lib/codegen'
 import { config } from '../../config'
+import { speakLines, cancelSpeech, supportsSpeech } from '../../lib/voice'
 
 interface Row {
   id: number
@@ -39,7 +40,10 @@ function highlight(line: string): string {
 const MODULES = ['vision', 'runtime', 'merge', 'tensor', 'bridge', 'kernel', 'graph', 'device']
 
 export default function CodeStream({ onExit }: { onExit: () => void }) {
-  const { play } = useSound()
+  const { play, enabled, toggle } = useSound()
+  const [phase, setPhase] = useState<'prep' | 'build'>('prep')
+  const [cap, setCap] = useState('')
+  const [capActive, setCapActive] = useState(true)
   const [rows, setRows] = useState<Row[]>([])
   const [typing, setTyping] = useState('')
   const [fileName, setFileName] = useState('core/vision.pipeline.ts')
@@ -65,6 +69,66 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
       setMod(MODULES[Math.floor(Math.random() * MODULES.length)])
     }, 600)
     return () => window.clearInterval(iv)
+  }, [])
+
+  // extra build telemetry (feels like a busy compiler)
+  const [threads, setThreads] = useState(12)
+  const [temp, setTemp] = useState(58)
+  const [queue, setQueue] = useState(34)
+  const [heap, setHeap] = useState(41)
+  useEffect(() => {
+    const iv = window.setInterval(() => {
+      setThreads(8 + Math.floor(Math.random() * 24))
+      setTemp(52 + Math.floor(Math.random() * 20))
+      setQueue(Math.max(0, 60 - Math.floor(Math.random() * 60)))
+      setHeap(30 + Math.floor(Math.random() * 60))
+    }, 900)
+    return () => window.clearInterval(iv)
+  }, [])
+
+  // opening robot narration + typed transmission caption
+  const spoke = useRef(false)
+  const speakBrief = () => {
+    if (spoke.current) return
+    spoke.current = true
+    speakLines(config.codeStream.narration, {
+      rate: config.codeStream.voice.rate,
+      pitch: config.codeStream.voice.pitch,
+    })
+  }
+  useEffect(() => {
+    const narration = config.codeStream.narration
+    if (enabled) speakBrief()
+
+    let stopped = false
+    const timers: number[] = []
+    let li = 0
+    let ci = 0
+    const type = () => {
+      if (stopped) return
+      const full = narration[li] ?? ''
+      if (ci <= full.length) {
+        setCap(full.slice(0, ci))
+        ci += 1
+        timers.push(window.setTimeout(type, 40 + Math.random() * 34))
+      } else {
+        li += 1
+        ci = 0
+        if (li === 1) setPhase('build') // console appears after the intro line
+        if (li < narration.length) {
+          timers.push(window.setTimeout(type, 950))
+        } else {
+          timers.push(window.setTimeout(() => setCapActive(false), 1800))
+        }
+      }
+    }
+    timers.push(window.setTimeout(type, 550))
+    return () => {
+      stopped = true
+      timers.forEach((t) => window.clearTimeout(t))
+      cancelSpeech()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -154,6 +218,25 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
         </div>
       </div>
 
+      {/* robot transmission caption during the opening brief */}
+      <AnimatePresence>
+        {capActive && phase === 'build' && (
+          <motion.div
+            className="cs-caption"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <span className="cs-cap-dot" />
+            <span className="cs-cap-tag">VOICE // ENGINE BRIEF</span>
+            <span className="cs-cap-txt">
+              {cap}
+              <span className="cs-caret" />
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="cs-main">
         <aside className="cs-tree">
           <div className="cs-tree-h">BUILD TREE</div>
@@ -169,6 +252,10 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
             <div className="cs-kv"><span>MODULE</span><b>{mod}</b></div>
             <div className="cs-kv"><span>WRITTEN</span><b>{kb}</b></div>
             <div className="cs-kv"><span>LINES</span><b>{lineCount.toLocaleString()}</b></div>
+            <div className="cs-kv"><span>THREADS</span><b>{threads}</b></div>
+            <div className="cs-kv"><span>HEAP</span><b>{heap}%</b></div>
+            <div className="cs-kv"><span>QUEUE</span><b>{queue}</b></div>
+            <div className="cs-kv"><span>CORE °C</span><b>{temp}</b></div>
             <div className="cs-kv"><span>CKSUM</span><b>0x{cksum.slice(0, 6)}</b></div>
           </div>
         </aside>
@@ -203,6 +290,48 @@ export default function CodeStream({ onExit }: { onExit: () => void }) {
           </div>
         </section>
       </div>
+
+      {/* opening "preparing your engine" splash + robot voice */}
+      <AnimatePresence>
+        {phase === 'prep' && (
+          <motion.div
+            className="cs-prep"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="cs-prep-brand">
+              <span className="cs-dot" /> CORE BUILD ENGINE
+            </div>
+            <div className="cs-prep-wave">
+              {Array.from({ length: 28 }).map((_, i) => (
+                <span key={i} style={{ animationDelay: `${(i % 14) * 0.06}s` }} />
+              ))}
+            </div>
+            <div className="cs-prep-title">{config.codeStream.prepTitle}</div>
+            <div className="cs-prep-sub">{config.codeStream.prepSub}</div>
+            <div className="cs-prep-line">
+              {cap}
+              <span className="cs-caret" />
+            </div>
+            <div className="cs-prep-shimmer"><span /></div>
+            {supportsSpeech() && !enabled && (
+              <button
+                className="btn amber"
+                onClick={() => {
+                  if (!enabled) toggle()
+                  speakBrief()
+                }}
+              >
+                🔊 ENABLE VOICE
+              </button>
+            )}
+            <div className="cs-prep-note">
+              COMPILING NATIVE RUNTIME · DO NOT CLOSE THIS WINDOW
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {black && <div className="black-cut" />}
     </motion.div>
