@@ -3,9 +3,24 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useSound } from '../../hooks/useSoundToggle'
 import { config, zh } from '../../config'
 import { hex, randInt } from '../../lib/random'
+import { speakLines, supportsSpeech } from '../../lib/voice'
 import GlitchText from '../ui/GlitchText'
 
 type Phase = 'idle' | 'requesting' | 'live' | 'scanning' | 'verified' | 'denied'
+
+interface Props {
+  onDone: () => void
+  /** Header/copy overrides so the same gate can front different steps. */
+  kicker?: string
+  title?: string
+  subtitleEn?: string
+  subtitleZh?: string
+  verifiedTitle?: string
+  verifiedSubEn?: string
+  verifiedSubZh?: string
+  /** Robot lines spoken once the scan verifies (only when sound is on). */
+  speakOnVerify?: string[]
+}
 
 /**
  * Cinematic "operator biometric" gate.
@@ -27,8 +42,18 @@ const SCAN_LINES: string[] = [
   'SIGNATURE CONFIDENCE {N}%',
 ]
 
-export default function OperatorScan({ onDone }: { onDone: () => void }) {
-  const { play } = useSound()
+export default function OperatorScan({
+  onDone,
+  kicker = 'RESTRICTED GATE // 生物识别验证',
+  title = 'OPERATOR VERIFICATION',
+  subtitleEn = 'PRESENT AUTHORIZED CREDENTIAL TO THE OPTICAL SENSOR',
+  subtitleZh = '出示凭证以继续',
+  verifiedTitle = 'IDENTITY VERIFIED',
+  verifiedSubEn = 'ACCESS GRANTED',
+  verifiedSubZh = zh.authorized,
+  speakOnVerify,
+}: Props) {
+  const { play, enabled, toggle } = useSound()
   const [phase, setPhase] = useState<Phase>('idle')
   const [pct, setPct] = useState(0)
   const [log, setLog] = useState<string[]>([])
@@ -57,6 +82,28 @@ export default function OperatorScan({ onDone }: { onDone: () => void }) {
       v.play().catch(() => {})
     }
   }, [phase])
+
+  // Robot confirmation once the scan verifies (only when sound is on).
+  const spoke = useRef(false)
+  useEffect(() => {
+    if (phase !== 'verified' || spoke.current) return
+    if (!speakOnVerify?.length || !enabled) return
+    spoke.current = true
+    speakLines(speakOnVerify, {
+      rate: config.welcome.voice.rate,
+      pitch: config.welcome.voice.pitch,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
+
+  const speakNow = () => {
+    if (!speakOnVerify?.length) return
+    spoke.current = true
+    speakLines(speakOnVerify, {
+      rate: config.welcome.voice.rate,
+      pitch: config.welcome.voice.pitch,
+    })
+  }
 
   const enable = async () => {
     if (phase === 'requesting') return
@@ -122,14 +169,12 @@ export default function OperatorScan({ onDone }: { onDone: () => void }) {
       transition={{ duration: 0.6 }}
     >
       <div className="opscan-head">
-        <div className="opscan-kicker">
-          RESTRICTED GATE // 生物识别验证
-        </div>
-        <GlitchText as="h2" text="OPERATOR VERIFICATION" intensity={0.06} />
+        <div className="opscan-kicker">{kicker}</div>
+        <GlitchText as="h2" text={title} intensity={0.06} />
         <div className="opscan-sub">
-          PRESENT AUTHORIZED CREDENTIAL TO THE OPTICAL SENSOR
-          {config.bilingualLabels && (
-            <span className="zh"> · 出示凭证以继续</span>
+          {subtitleEn}
+          {config.bilingualLabels && subtitleZh && (
+            <span className="zh"> · {subtitleZh}</span>
           )}
         </div>
       </div>
@@ -200,11 +245,11 @@ export default function OperatorScan({ onDone }: { onDone: () => void }) {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.35 }}
             >
-              <GlitchText text="IDENTITY VERIFIED" always />
+              <GlitchText text={verifiedTitle} always />
               <div className="opscan-granted">
-                ACCESS GRANTED
-                {config.bilingualLabels && (
-                  <span className="zh"> · {zh.authorized}</span>
+                {verifiedSubEn}
+                {config.bilingualLabels && verifiedSubZh && (
+                  <span className="zh"> · {verifiedSubZh}</span>
                 )}
               </div>
             </motion.div>
@@ -268,18 +313,33 @@ export default function OperatorScan({ onDone }: { onDone: () => void }) {
           </>
         )}
         {phase === 'verified' && (
-          <motion.button
-            className="btn primary"
-            onClick={() => {
-              play('whoosh')
-              onDone()
-            }}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            CONTINUE ▸
-          </motion.button>
+          <>
+            {speakOnVerify?.length && supportsSpeech() && !enabled && (
+              <motion.button
+                className="btn amber"
+                onClick={() => {
+                  if (!enabled) toggle()
+                  speakNow()
+                }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                🔊 ENABLE VOICE
+              </motion.button>
+            )}
+            <motion.button
+              className="btn primary"
+              onClick={() => {
+                play('whoosh')
+                onDone()
+              }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              CONTINUE ▸
+            </motion.button>
+          </>
         )}
       </div>
 

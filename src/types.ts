@@ -5,6 +5,7 @@ export type Stage =
   | 'accessChain'
   | 'priceReveal'
   | 'cryptoSession'
+  | 'payVerify'
   | 'final'
   | 'codestream'
 

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { CryptoAsset, Engine, Stage } from './types'
+import { config } from './config'
 import { targetEngine } from './data/engines'
 import { Background } from './components/background/Background'
 import CRTOverlay from './components/background/CRTOverlay'
@@ -105,6 +106,25 @@ export default function App() {
                 engine={engine}
                 coin={coin}
                 onBack={() => setStage('priceReveal')}
+                onDone={() => {
+                  window.scrollTo({ top: 0 })
+                  setStage('payVerify')
+                }}
+              />
+            </motion.div>
+          )}
+
+          {stage === 'payVerify' && (
+            <motion.div key="payVerify" {...fade}>
+              <OperatorScan
+                kicker={config.payVerify.kicker}
+                title={config.payVerify.title}
+                subtitleEn={config.payVerify.subtitleEn}
+                subtitleZh={config.payVerify.subtitleZh}
+                verifiedTitle={config.payVerify.verifiedTitle}
+                verifiedSubEn={config.payVerify.verifiedSubEn}
+                verifiedSubZh={config.payVerify.verifiedSubZh}
+                speakOnVerify={config.payVerify.speak}
                 onDone={() => setStage('final')}
               />
             </motion.div>

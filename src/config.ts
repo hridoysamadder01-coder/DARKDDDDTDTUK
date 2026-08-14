@@ -57,6 +57,18 @@ export interface AppConfig {
       lines: string[]
     }
   }
+
+  /** Copy + robot lines for the payment-confirmation camera gate. */
+  payVerify: {
+    kicker: string
+    title: string
+    subtitleEn: string
+    subtitleZh: string
+    verifiedTitle: string
+    verifiedSubEn: string
+    verifiedSubZh: string
+    speak: string[]
+  }
 }
 
 export const config: AppConfig = {
@@ -99,6 +111,21 @@ export const config: AppConfig = {
         'THE MOST POWERFUL ENGINE IN THE INDEX — RESERVED FOR YOU',
       ],
     },
+  },
+
+  payVerify: {
+    kicker: 'SETTLEMENT GATE // 支付验证',
+    title: 'PAYMENT VERIFICATION',
+    subtitleEn: 'PRESENT SETTLEMENT CREDENTIAL TO THE OPTICAL SENSOR',
+    subtitleZh: '出示支付凭证以确认',
+    verifiedTitle: 'PAYMENT CONFIRMED',
+    verifiedSubEn: 'SETTLEMENT SEALED',
+    verifiedSubZh: '支付已确认',
+    speak: [
+      'PAYMENT SIGNATURE CONFIRMED',
+      'SETTLEMENT SEALED ON THE LEDGER',
+      'OBSIDIAN CORE X IS NOW YOURS MISTER JACK-SPARROW',
+    ],
   },
 }
 
