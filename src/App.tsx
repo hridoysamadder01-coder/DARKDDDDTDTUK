@@ -5,6 +5,8 @@ import { config } from './config'
 import { targetEngine } from './data/engines'
 import { Background } from './components/background/Background'
 import CRTOverlay from './components/background/CRTOverlay'
+import ClickFX from './components/fx/ClickFX'
+import ThreatOverlay from './components/fx/ThreatOverlay'
 import SoundToggle from './components/ui/SoundToggle'
 import BootSequence from './components/stages/BootSequence'
 import OperatorScan from './components/stages/OperatorScan'
@@ -49,10 +51,19 @@ export default function App() {
     setStage('terminal')
   }, [])
 
+  // Ambient counter-intrusion alerts on the "exploration" stages.
+  const threatActive =
+    stage === 'terminal' ||
+    stage === 'accessChain' ||
+    stage === 'priceReveal' ||
+    stage === 'cryptoSession'
+
   return (
     <>
       <Background paused={heavyBgPaused} />
       <CRTOverlay />
+      <ClickFX />
+      <ThreatOverlay active={threatActive} />
 
       {/* Persistent chrome (the code-stream screen has its own top bar) */}
       {stage !== 'codestream' && <SoundToggle />}

@@ -1253,3 +1253,70 @@
   .checkout-body { padding: 22px 14px 20px; }
   .checkout-detail { grid-template-columns: 1fr 1fr; gap: 8px; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   GLOBAL FX · click targeting-lock + counter-intrusion alerts
+   ───────────────────────────────────────────────────────────── */
+.clickfx {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9998; overflow: hidden;
+}
+.cf-hit { position: absolute; width: 0; height: 0; }
+.cf-ring {
+  position: absolute; left: 0; top: 0; width: 10px; height: 10px;
+  margin: -5px 0 0 -5px; border: 1px solid var(--green); border-radius: 50%;
+  box-shadow: 0 0 10px var(--green-glow);
+  animation: cf-ring 0.62s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.cf-ring2 { animation-delay: 0.09s; border-color: var(--green-dim); opacity: 0.7; }
+@keyframes cf-ring {
+  0% { transform: scale(0.25); opacity: 0.95; }
+  100% { transform: scale(5.5); opacity: 0; }
+}
+.cf-dot {
+  position: absolute; left: 0; top: 0; width: 4px; height: 4px; margin: -2px 0 0 -2px;
+  background: var(--green); border-radius: 50%; box-shadow: 0 0 10px var(--green);
+  animation: cf-dot 0.5s ease-out forwards;
+}
+@keyframes cf-dot { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.4); } }
+.cf-cross {
+  position: absolute; left: 0; top: 0;
+  animation: cf-dot 0.55s ease-out forwards;
+}
+.cf-cross::before, .cf-cross::after {
+  content: ''; position: absolute; background: var(--green); box-shadow: 0 0 6px var(--green-glow);
+}
+.cf-cross::before { left: -11px; top: -0.5px; width: 22px; height: 1px; }
+.cf-cross::after { left: -0.5px; top: -11px; width: 1px; height: 22px; }
+
+/* counter-intrusion banner */
+.threat {
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  z-index: 82; display: flex; align-items: center; gap: 10px;
+  padding: 8px 18px; max-width: 92vw;
+  border: 1px solid var(--red-glow);
+  background: linear-gradient(180deg, rgba(40, 8, 12, 0.86), rgba(20, 4, 7, 0.82));
+  box-shadow: 0 0 26px var(--red-glow), inset 0 0 20px rgba(0, 0, 0, 0.5);
+  font-family: var(--font-mono);
+}
+.threat .glitch {
+  font-size: 11px; letter-spacing: 0.14em; color: var(--red);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.threat-ic { color: var(--red); font-size: 13px; flex: none; animation: hail-blink 0.7s ease-in-out infinite; }
+
+/* brief red screen-edge pulse when an alert fires */
+.threat-edge {
+  position: fixed; inset: 0; pointer-events: none; z-index: 81;
+  box-shadow: inset 0 0 120px rgba(214, 67, 79, 0.16);
+  animation: threat-edge 2.4s ease-out forwards;
+}
+@keyframes threat-edge {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (max-width: 480px) {
+  .threat { top: 8px; padding: 7px 12px; }
+  .threat .glitch { font-size: 10px; letter-spacing: 0.1em; }
+}
