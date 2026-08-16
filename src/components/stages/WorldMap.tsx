@@ -99,6 +99,26 @@ export default function WorldMap({ cls = '' }: { cls?: string }) {
   const [blocked, setBlocked] = useState(4127)
   const idRef = useRef(0)
 
+  // periodic target-lock cycle
+  const [lock, setLock] = useState<{ n: string; x: number; y: number; id: number } | null>(null)
+  const lockId = useRef(0)
+  useEffect(() => {
+    let alive = true
+    let t = 0
+    let clr = 0
+    const cycle = () => {
+      t = window.setTimeout(() => {
+        if (!alive) return
+        const c = pick(CITIES)
+        setLock({ n: c.n, x: c.x, y: c.y, id: lockId.current++ })
+        clr = window.setTimeout(() => { if (alive) setLock(null) }, 2200)
+        cycle()
+      }, 3200 + Math.random() * 3000)
+    }
+    cycle()
+    return () => { alive = false; window.clearTimeout(t); window.clearTimeout(clr) }
+  }, [])
+
   useEffect(() => {
     let alive = true
     let t = 0
@@ -161,6 +181,21 @@ export default function WorldMap({ cls = '' }: { cls?: string }) {
               <circle className="wm-hit" cx={a.tx} cy={a.ty} r={4} />
             </g>
           ))}
+
+          {/* target lock reticle */}
+          {lock && (
+            <g className="wm-lock" key={lock.id}>
+              <circle className="wm-lock-ping" cx={lock.x} cy={lock.y} r={10} />
+              <rect className="wm-lock-box" x={lock.x - 16} y={lock.y - 16} width={32} height={32} />
+              <line className="wm-lock-x" x1={lock.x - 26} y1={lock.y} x2={lock.x - 9} y2={lock.y} />
+              <line className="wm-lock-x" x1={lock.x + 9} y1={lock.y} x2={lock.x + 26} y2={lock.y} />
+              <line className="wm-lock-x" x1={lock.x} y1={lock.y - 26} x2={lock.x} y2={lock.y - 9} />
+              <line className="wm-lock-x" x1={lock.x} y1={lock.y + 9} x2={lock.x} y2={lock.y + 26} />
+              <text className="wm-lock-lbl" x={lock.x} y={lock.y - 24} textAnchor="middle">
+                ◎ TARGET LOCKED · {lock.n}
+              </text>
+            </g>
+          )}
 
           {/* city nodes */}
           <g className="wm-cities">

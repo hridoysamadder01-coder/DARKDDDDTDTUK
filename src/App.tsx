@@ -7,6 +7,7 @@ import { Background } from './components/background/Background'
 import CRTOverlay from './components/background/CRTOverlay'
 import ClickFX from './components/fx/ClickFX'
 import GlitchBurst from './components/fx/GlitchBurst'
+import StatusBar from './components/fx/StatusBar'
 import ThreatOverlay from './components/fx/ThreatOverlay'
 import SoundToggle from './components/ui/SoundToggle'
 import OpsBoot from './components/stages/OpsBoot'
@@ -62,6 +63,15 @@ export default function App() {
     stage === 'priceReveal' ||
     stage === 'cryptoSession'
 
+  // Persistent bottom status bar on the content stages (not the full-screen
+  // ones that carry their own chrome).
+  const statusActive =
+    stage === 'terminal' ||
+    stage === 'accessChain' ||
+    stage === 'priceReveal' ||
+    stage === 'cryptoSession' ||
+    stage === 'final'
+
   return (
     <>
       <Background paused={heavyBgPaused} />
@@ -69,6 +79,7 @@ export default function App() {
       <ClickFX />
       <GlitchBurst />
       <ThreatOverlay active={threatActive} />
+      <StatusBar active={statusActive} />
 
       {/* Persistent chrome (the ops-boot & code-stream screens own their top bars) */}
       {stage !== 'codestream' && stage !== 'opsBoot' && <SoundToggle />}

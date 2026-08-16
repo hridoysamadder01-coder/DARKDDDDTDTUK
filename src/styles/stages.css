@@ -1573,3 +1573,49 @@
   .chain-grid { grid-template-columns: 1fr; }
   .chain-side.hide-sm { display: none; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   MAP TARGET LOCK + PERSISTENT STATUS BAR
+   ───────────────────────────────────────────────────────────── */
+.wm-lock-box {
+  fill: none; stroke: var(--amber); stroke-width: 1.4;
+  transform-box: fill-box; transform-origin: center;
+  animation: wm-lockin 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: drop-shadow(0 0 4px var(--amber-glow));
+}
+@keyframes wm-lockin { from { transform: scale(2.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.wm-lock-x { stroke: var(--amber); stroke-width: 1.2; }
+.wm-lock-ping {
+  fill: none; stroke: var(--amber); stroke-width: 1.2;
+  transform-box: fill-box; transform-origin: center;
+  animation: wm-lockping 1.5s ease-out infinite;
+}
+@keyframes wm-lockping { 0% { transform: scale(0.5); opacity: 0.85; } 100% { transform: scale(3.6); opacity: 0; } }
+.wm-lock-lbl { fill: var(--amber); font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.08em; }
+
+.statusbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  height: 26px; display: flex; align-items: center; gap: 14px;
+  padding: 0 12px; font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.08em; color: var(--text-dim);
+  background: linear-gradient(0deg, rgba(2, 5, 4, 0.96), rgba(2, 5, 4, 0.82));
+  border-top: 1px solid var(--line-strong);
+  backdrop-filter: blur(2px);
+}
+.sb-l { flex: none; color: var(--green-dim); white-space: nowrap; }
+.sb-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green-glow);
+  margin-right: 6px; vertical-align: middle; animation: pulseDot 1.4s ease-in-out infinite;
+}
+.sb-mid { flex: 1; overflow: hidden; position: relative; min-width: 0; }
+.sb-marquee { display: inline-block; white-space: nowrap; will-change: transform; animation: sb-scroll 34s linear infinite; }
+@keyframes sb-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.sb-r { flex: none; color: var(--text-dim); white-space: nowrap; }
+
+/* keep the terminal's last rows clear of the fixed bar */
+.shell { padding-bottom: 40px; }
+@media (max-width: 600px) {
+  .statusbar { font-size: 9px; gap: 8px; }
+  .sb-r { max-width: 42%; overflow: hidden; text-overflow: ellipsis; }
+}
