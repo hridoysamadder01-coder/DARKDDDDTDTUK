@@ -10,6 +10,7 @@ import GlitchBurst from './components/fx/GlitchBurst'
 import StatusBar from './components/fx/StatusBar'
 import ThreatOverlay from './components/fx/ThreatOverlay'
 import SoundToggle from './components/ui/SoundToggle'
+import KernelBoot from './components/stages/KernelBoot'
 import OpsBoot from './components/stages/OpsBoot'
 import OperatorScan from './components/stages/OperatorScan'
 import WelcomeHail from './components/stages/WelcomeHail'
@@ -28,7 +29,7 @@ const fade = {
 }
 
 export default function App() {
-  const [stage, setStage] = useState<Stage>('opsBoot')
+  const [stage, setStage] = useState<Stage>('kernelBoot')
   const [engine, setEngine] = useState<Engine>(targetEngine)
   const [coin, setCoin] = useState<CryptoAsset | null>(null)
   const [welcomed, setWelcomed] = useState(false)
@@ -36,11 +37,13 @@ export default function App() {
   // Pause the heavy background canvases during full-screen cinematic stages
   // that already carry their own motion (keeps mobile framerate healthy).
   const heavyBgPaused =
+    stage === 'kernelBoot' ||
     stage === 'opsBoot' ||
     stage === 'accessChain' ||
     stage === 'final' ||
     stage === 'codestream'
 
+  const goOps = useCallback(() => setStage('opsBoot'), [])
   const goTerminal = useCallback(() => setStage('terminal'), [])
   const goCamera = useCallback(() => {
     window.scrollTo({ top: 0 })
@@ -82,15 +85,24 @@ export default function App() {
       <StatusBar active={statusActive} />
 
       {/* Persistent chrome (the ops-boot & code-stream screens own their top bars) */}
-      {stage !== 'codestream' && stage !== 'opsBoot' && <SoundToggle />}
-      {(stage === 'opsBoot' || stage === 'cameraVerify') && (
-        <button className="skip-btn" onClick={stage === 'opsBoot' ? goCamera : goTerminal}>
+      {stage !== 'codestream' && stage !== 'opsBoot' && stage !== 'kernelBoot' && <SoundToggle />}
+      {(stage === 'kernelBoot' || stage === 'opsBoot' || stage === 'cameraVerify') && (
+        <button
+          className="skip-btn"
+          onClick={stage === 'kernelBoot' ? goOps : stage === 'opsBoot' ? goCamera : goTerminal}
+        >
           SKIP ▸
         </button>
       )}
 
       <div className="stage-root">
         <AnimatePresence mode="wait">
+          {stage === 'kernelBoot' && (
+            <motion.div key="kboot" {...fade}>
+              <KernelBoot onDone={goOps} />
+            </motion.div>
+          )}
+
           {stage === 'opsBoot' && (
             <motion.div key="opsboot" {...fade}>
               <OpsBoot onDone={goCamera} />

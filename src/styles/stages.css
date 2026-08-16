@@ -1619,3 +1619,25 @@
   .statusbar { font-size: 9px; gap: 8px; }
   .sb-r { max-width: 42%; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   KERNEL BOOT · dmesg-style cold boot before the ops console
+   ───────────────────────────────────────────────────────────── */
+.kboot {
+  position: relative; z-index: 12;
+  height: 100dvh; min-height: 100dvh;
+  background: #000; color: var(--text-dim);
+  font-family: var(--font-mono); font-size: 12.5px; line-height: 1.5;
+  padding: 22px 24px; display: flex; flex-direction: column; overflow: hidden;
+}
+.kboot-body { flex: 1; overflow: hidden; }
+.kb-line { white-space: pre-wrap; word-break: break-word; }
+.kb-ts { color: var(--green-deep); }
+.kb-brace { color: var(--text-dim); }
+.kb-ok { color: var(--green); }
+.kb-warn { color: var(--amber); }
+.kboot-online {
+  margin-top: 16px; font-size: clamp(15px, 3vw, 22px); font-weight: 700;
+  letter-spacing: 0.14em; color: var(--green); text-shadow: 0 0 18px var(--green-glow);
+}
+@media (max-width: 600px) { .kboot { font-size: 10.5px; padding: 16px 14px; } }

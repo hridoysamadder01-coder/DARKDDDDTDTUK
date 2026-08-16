@@ -1,4 +1,5 @@
 export type Stage =
+  | 'kernelBoot'
   | 'opsBoot'
   | 'boot'
   | 'cameraVerify'

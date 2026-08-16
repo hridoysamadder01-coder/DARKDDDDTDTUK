@@ -18,7 +18,7 @@ const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 const KW =
-  /("[^"]*"|'[^']*')|(0x[0-9A-Fa-f]+)|\b(import|from|export|const|async|function|await|return|for|of|static|include|define|new|let|struct|void|size_t)\b/g
+  /("[^"]*"|'[^']*')|(0x[0-9A-Fa-f]+)|\b(import|from|export|const|async|function|await|return|for|of|static|include|define|new|let|struct|void|size_t|def|class|self|pub|fn|use|impl|mut|package|func|range|in|u64)\b/g
 
 function highlight(line: string): string {
   if (/^\s*(\/\/|\*|#(?!include|define))/.test(line))

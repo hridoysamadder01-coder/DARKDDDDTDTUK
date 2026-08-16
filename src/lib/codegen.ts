@@ -87,11 +87,76 @@ const logLines = (): string[] => {
   return out
 }
 
+const pyFile = (): string[] => {
+  const out: string[] = []
+  out.push(`import core.${pick(MODULES)} as ${pick(MODULES)}`)
+  out.push(`from core.${pick(MODULES)} import ${pick(FN)}, ${pick(FN)}`)
+  out.push('')
+  out.push(`CORE_SIGNATURE = 0x${hx(8)}`)
+  out.push(`LAYER_MASK = 0x${hx(6)}`)
+  out.push('')
+  out.push(`async def ${pick(FN)}(model: ModelRef) -> Tensor:`)
+  out.push(`    graph = await allocate_graph(model.signature)`)
+  out.push(`    for layer in model.layers:`)
+  out.push(`        w = quantize_weights(layer.weights, 0x${hx(4)})`)
+  out.push(`        graph.bind(layer.id, w, device="${pick(['android', 'ios', 'universal'])}")`)
+  out.push(`    return graph.seal(CORE_SIGNATURE)`)
+  out.push('')
+  out.push(`# ${pick(['cross-model merge', 'native runtime', 'unified vision stack'])}`)
+  for (let i = 0; i < ri(3, 6); i++) {
+    const r = Math.random()
+    if (r < 0.4) out.push(`${pick(MODULES)}_${hx(3)} = {"rate": ${ri(1, 240)}, "mask": 0x${hx(4)}}`)
+    else if (r < 0.7) out.push(`    graph.emit("${pick(MODULES)}", 0x${hx(8)})`)
+    else out.push(`# seal ${pick(MODULES)} :: ${hx(4)}`)
+  }
+  return out
+}
+
+const rsFile = (): string[] => {
+  const out: string[] = []
+  out.push(`use core::${pick(MODULES)}::{${pick(TYPES)}, ${pick(TYPES)}};`)
+  out.push(`use core::runtime::${pick(FN)};`)
+  out.push('')
+  out.push(`const CORE_SIGNATURE: u64 = 0x${hx(8)};`)
+  out.push('')
+  out.push(`pub fn ${pick(FN)}(model: &ModelRef) -> ${pick(TYPES)} {`)
+  out.push(`    let mut graph = allocate_graph(model.sig);`)
+  out.push(`    for layer in model.layers.iter() {`)
+  out.push(`        let w = quantize(&layer.weights, 0x${hx(4)});`)
+  out.push(`        graph.bind(layer.id, w);`)
+  out.push(`    }`)
+  out.push(`    graph.seal(CORE_SIGNATURE)`)
+  out.push(`}`)
+  return out
+}
+
+const goFile = (): string[] => {
+  const out: string[] = []
+  out.push(`package ${pick(MODULES)}`)
+  out.push('')
+  out.push(`import "core/${pick(MODULES)}"`)
+  out.push('')
+  out.push(`const CoreSignature = 0x${hx(8)}`)
+  out.push('')
+  out.push(`func ${pick(FN)}(m *ModelRef) *${pick(TYPES)} {`)
+  out.push(`    g := allocGraph(m.Sig)`)
+  out.push(`    for _, layer := range m.Layers {`)
+  out.push(`        w := quantize(layer.Weights, 0x${hx(4)})`)
+  out.push(`        g.Bind(layer.ID, w)`)
+  out.push(`    }`)
+  out.push(`    return g.Seal(CoreSignature)`)
+  out.push(`}`)
+  return out
+}
+
 const FILES = [
   { name: 'core/vision.pipeline.ts', gen: tsFile },
   { name: 'engine/merge.crossmodel.ts', gen: tsFile },
   { name: 'runtime/native.bridge.cpp', gen: cFile },
   { name: 'core/tensor.ops.c', gen: cFile },
+  { name: 'core/vision.pipeline.py', gen: pyFile },
+  { name: 'engine/merge.crossmodel.rs', gen: rsFile },
+  { name: 'runtime/native.bridge.go', gen: goFile },
   { name: 'device/android.runtime.kt', gen: tsFile },
   { name: 'device/ios.metal.swift', gen: tsFile },
   { name: 'build/link.manifest', gen: logLines },
