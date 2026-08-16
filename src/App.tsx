@@ -6,6 +6,7 @@ import { targetEngine } from './data/engines'
 import { Background } from './components/background/Background'
 import CRTOverlay from './components/background/CRTOverlay'
 import ClickFX from './components/fx/ClickFX'
+import GlitchBurst from './components/fx/GlitchBurst'
 import ThreatOverlay from './components/fx/ThreatOverlay'
 import SoundToggle from './components/ui/SoundToggle'
 import OpsBoot from './components/stages/OpsBoot'
@@ -66,6 +67,7 @@ export default function App() {
       <Background paused={heavyBgPaused} />
       <CRTOverlay />
       <ClickFX />
+      <GlitchBurst />
       <ThreatOverlay active={threatActive} />
 
       {/* Persistent chrome (the ops-boot & code-stream screens own their top bars) */}

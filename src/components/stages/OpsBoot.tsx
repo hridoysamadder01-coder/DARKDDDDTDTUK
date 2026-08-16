@@ -5,6 +5,7 @@ import { makeBuildFile } from '../../lib/codegen'
 import { ambientLine } from '../../lib/feed'
 import { hex, pick, randInt } from '../../lib/random'
 import GlitchText from '../ui/GlitchText'
+import WorldMap from './WorldMap'
 
 /* ───────── one streaming code column (multi coding animation) ───────── */
 function CodePanel({ label, seed, cls = '' }: { label: string; seed: number; cls?: string }) {
@@ -66,7 +67,7 @@ function CodePanel({ label, seed, cls = '' }: { label: string; seed: number; cls
 
 /* ───────── rotating radar + live trace hops ───────── */
 const NODES = ['NODE-7X', 'OMEGA-4', 'VAULT-11', 'EU-GATE-9', 'BLACKNODE-21', 'GHOST-3', 'RELAY-88', 'SINK-0', 'ZERO-LINK']
-function RadarPanel() {
+function RadarPanel({ cls = '' }: { cls?: string }) {
   const [hops, setHops] = useState<string[]>([])
   useEffect(() => {
     let k = 1
@@ -80,7 +81,7 @@ function RadarPanel() {
     { top: '30%', left: '54%' }, { top: '72%', left: '24%' }, { top: '54%', left: '78%' },
   ]
   return (
-    <div className="ops-panel">
+    <div className={`ops-panel ${cls}`}>
       <div className="ops-h"><span className="ops-h-dot" /> NETWORK TRACE<span className="ops-h-r">LIVE</span></div>
       <div className="ops-radar-wrap">
         <div className="ops-radar">
@@ -103,7 +104,7 @@ function RadarPanel() {
 }
 
 /* ───────── fast intercept packet log ───────── */
-function PacketPanel() {
+function PacketPanel({ cls = '' }: { cls?: string }) {
   const [lines, setLines] = useState<Array<{ id: number; t: string; k: string }>>([])
   useEffect(() => {
     let id = 0
@@ -114,7 +115,7 @@ function PacketPanel() {
     return () => window.clearInterval(iv)
   }, [])
   return (
-    <div className="ops-panel">
+    <div className={`ops-panel ${cls}`}>
       <div className="ops-h"><span className="ops-h-dot" /> PACKET INTERCEPT<span className="ops-h-r">NODE-04</span></div>
       <div className="ops-log">
         {lines.map((l) => (
@@ -151,14 +152,14 @@ function HexPanel({ cls = '' }: { cls?: string }) {
 
 /* ───────── live system meters ───────── */
 const METERS = ['CPU', 'MEM', 'NET', 'GPU', 'I/O', 'CRYPT']
-function MetersPanel() {
+function MetersPanel({ cls = '' }: { cls?: string }) {
   const [vals, setVals] = useState<number[]>(() => METERS.map(() => randInt(30, 90)))
   useEffect(() => {
     const iv = window.setInterval(() => setVals(METERS.map(() => randInt(24, 99))), 420)
     return () => window.clearInterval(iv)
   }, [])
   return (
-    <div className="ops-panel">
+    <div className={`ops-panel ${cls}`}>
       <div className="ops-h"><span className="ops-h-dot" /> CORE LOAD<span className="ops-h-r">REAL-TIME</span></div>
       <div className="ops-meters">
         {METERS.map((m, i) => (
@@ -168,6 +169,36 @@ function MetersPanel() {
             <span className="ops-meter-v">{vals[i]}%</span>
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+/* ───────── fictional target dossier ───────── */
+function DossierPanel({ cls = '' }: { cls?: string }) {
+  const [key, setKey] = useState(() => hex(16))
+  useEffect(() => {
+    const iv = window.setInterval(() => setKey(hex(16)), 700)
+    return () => window.clearInterval(iv)
+  }, [])
+  const rows: Array<[string, string, string]> = [
+    ['CODENAME', 'OBSIDIAN CORE X', 'g'],
+    ['ORIGIN', 'SECTOR-7 · CLASSIFIED', ''],
+    ['CLEARANCE', 'OMEGA', 'a'],
+    ['ENCRYPTION', 'LAYER 9 · SEALED', ''],
+    ['STATUS', 'BREACH IN PROGRESS', 'r'],
+  ]
+  return (
+    <div className={`ops-panel ${cls}`}>
+      <div className="ops-h"><span className="ops-h-dot" /> TARGET DOSSIER<span className="ops-h-r">EYES ONLY</span></div>
+      <div className="ops-dossier">
+        {rows.map(([k, v, tone]) => (
+          <div className="ops-dr" key={k}>
+            <span className="ops-dr-k">{k}</span>
+            <span className={`ops-dr-v ${tone === 'g' ? 'g' : tone === 'a' ? 'a' : tone === 'r' ? 'r' : ''}`}>{v}</span>
+          </div>
+        ))}
+        <div className="ops-dr-key">MASTER KEY · 0x{key}</div>
       </div>
     </div>
   )
@@ -241,12 +272,14 @@ export default function OpsBoot({ onDone }: { onDone: () => void }) {
       </div>
 
       <div className="ops-grid">
-        <CodePanel label="COMPILE-A" seed={1} />
-        <RadarPanel />
-        <HexPanel cls="hide-sm" />
-        <CodePanel label="COMPILE-B" seed={3} cls="hide-sm" />
-        <PacketPanel />
-        <MetersPanel />
+        <CodePanel label="COMPILE-A" seed={1} cls="ga-codeA" />
+        <WorldMap cls="ga-map" />
+        <RadarPanel cls="ga-radar" />
+        <CodePanel label="COMPILE-B" seed={3} cls="ga-codeB hide-sm" />
+        <MetersPanel cls="ga-meters" />
+        <HexPanel cls="ga-hex hide-sm" />
+        <PacketPanel cls="ga-packets" />
+        <DossierPanel cls="ga-dossier" />
       </div>
 
       <div className="ops-foot">
