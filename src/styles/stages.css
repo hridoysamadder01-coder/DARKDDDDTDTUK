@@ -1320,3 +1320,127 @@
   .threat { top: 8px; padding: 7px 12px; }
   .threat .glitch { font-size: 10px; letter-spacing: 0.1em; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   OPS BOOT · live multi-panel breach console (entry)
+   ───────────────────────────────────────────────────────────── */
+.ops {
+  position: relative; z-index: 12;
+  display: flex; flex-direction: column;
+  height: 100dvh; min-height: 100dvh;
+  padding: 12px; gap: 10px;
+  font-family: var(--font-mono);
+  background: linear-gradient(180deg, rgba(3, 6, 8, 0.92), rgba(3, 6, 8, 0.86));
+  overflow: hidden;
+}
+.ops-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 12px; padding-right: 90px; border: 1px solid var(--line-strong);
+  background: rgba(0, 0, 0, 0.4);
+}
+.ops-top-l { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.ops-top-l b { font-size: 12px; letter-spacing: 0.18em; color: var(--green); }
+.ops-top-sub { font-size: 10.5px; letter-spacing: 0.12em; color: var(--text-dim); }
+.ops-top-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulseDot 1.3s ease-in-out infinite; }
+.ops-top-r { display: flex; gap: 16px; flex-wrap: wrap; }
+.ops-top-r span { font-size: 10.5px; letter-spacing: 0.08em; color: var(--text-dim); white-space: nowrap; }
+.ops-top-r b { color: var(--text); }
+
+.ops-grid {
+  flex: 1; min-height: 0;
+  display: grid; gap: 10px;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.ops-panel {
+  display: flex; flex-direction: column; min-height: 0;
+  border: 1px solid var(--line); background: rgba(6, 11, 9, 0.5);
+  overflow: hidden;
+}
+.ops-h {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-bottom: 1px solid var(--line);
+  font-size: 9.5px; letter-spacing: 0.2em; color: var(--text-dim);
+  background: rgba(0, 0, 0, 0.28); flex: none;
+}
+.ops-h-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+.ops-h-r { margin-left: auto; color: var(--green-dim); letter-spacing: 0.1em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* code columns */
+.ops-code { flex: 1; min-height: 0; overflow: hidden; padding: 6px 8px; font-size: 10px; line-height: 1.5; color: var(--text-dim); }
+.ops-cl { white-space: pre; overflow: hidden; text-overflow: ellipsis; }
+.ops-cl.active { color: var(--green); }
+.ops-caret { display: inline-block; width: 5px; height: 0.9em; background: var(--green); margin-left: 1px; vertical-align: text-bottom; animation: blink 1.05s steps(1) infinite; }
+
+/* radar */
+.ops-radar-wrap { flex: 1; min-height: 0; display: flex; gap: 8px; padding: 8px; align-items: center; }
+.ops-radar {
+  position: relative; flex: none;
+  width: 120px; height: 120px; max-width: 46%;
+  aspect-ratio: 1; border-radius: 50%;
+  border: 1px solid var(--line-strong); overflow: hidden;
+  background: radial-gradient(circle, rgba(69,207,146,0.05), transparent 70%);
+}
+.ops-ring { position: absolute; border: 1px solid var(--line); border-radius: 50%; }
+.ops-ring.r1 { inset: 6%; } .ops-ring.r2 { inset: 26%; } .ops-ring.r3 { inset: 44%; }
+.ops-sweep {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(69, 207, 146, 0.34), rgba(69,207,146,0.04) 55deg, transparent 90deg, transparent 360deg);
+  animation: ops-spin 2.4s linear infinite;
+}
+@keyframes ops-spin { to { transform: rotate(360deg); } }
+.ops-blip { position: absolute; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: ops-blip 1.7s ease-in-out infinite; }
+@keyframes ops-blip { 0%,100% { opacity: 0.25; transform: scale(0.6); } 50% { opacity: 1; transform: scale(1.15); } }
+.ops-hops { flex: 1; min-width: 0; font-size: 9.5px; line-height: 1.7; color: var(--text-dim); overflow: hidden; }
+.ops-hop { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* packet log */
+.ops-log { flex: 1; min-height: 0; overflow: hidden; padding: 6px 8px; font-size: 9.5px; line-height: 1.6; }
+.ops-ll { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-dim); }
+.ops-ll.ok { color: var(--green); } .ops-ll.warn { color: var(--amber); } .ops-ll.err { color: var(--red); } .ops-ll.in { color: var(--green); }
+
+/* hex dump */
+.ops-hex { flex: 1; min-height: 0; overflow: hidden; padding: 6px 8px; font-size: 10px; line-height: 1.55; color: var(--green-dim); }
+.ops-hex-row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* meters */
+.ops-meters { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 8px 12px; }
+.ops-meter { display: flex; align-items: center; gap: 8px; font-size: 10px; }
+.ops-meter-k { width: 40px; color: var(--text-dim); letter-spacing: 0.08em; flex: none; }
+.ops-meter-bar { flex: 1; height: 5px; background: rgba(69, 207, 146, 0.1); overflow: hidden; }
+.ops-meter-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--green-deep), var(--green)); transition: width 0.35s ease; }
+.ops-meter-bar span.hot { background: linear-gradient(90deg, var(--amber), var(--red)); }
+.ops-meter-v { width: 34px; text-align: right; color: var(--text); flex: none; }
+
+/* footer master bar */
+.ops-foot {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 12px; border: 1px solid var(--line-strong); background: rgba(0, 0, 0, 0.42);
+}
+.ops-foot-status { font-size: 11px; letter-spacing: 0.12em; color: var(--green); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ops-foot-ic { color: var(--green); margin-right: 6px; }
+.ops-foot-hex { color: var(--text-dim); }
+.ops-foot-bar { flex: 1; height: 4px; background: rgba(69, 207, 146, 0.1); overflow: hidden; }
+.ops-foot-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--green-deep), var(--green)); box-shadow: 0 0 12px var(--green-glow); transition: width 0.15s linear; }
+.ops-foot-pct { font-size: 12px; color: var(--green); font-weight: 700; width: 44px; text-align: right; }
+
+/* breach finale */
+.ops-breach {
+  position: absolute; inset: 0; z-index: 20;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: radial-gradient(circle at center, rgba(4, 10, 8, 0.82), rgba(1, 3, 2, 0.95));
+}
+.ops-breach .glitch { font-size: clamp(26px, 6vw, 46px); font-weight: 800; letter-spacing: 0.14em; color: var(--green); text-shadow: 0 0 28px var(--green-glow); }
+.ops-breach-sub { font-size: 12px; letter-spacing: 0.3em; color: var(--amber); }
+.ops-breach-flash { position: absolute; inset: 0; background: var(--green); animation: ops-flash 0.5s ease-out forwards; }
+@keyframes ops-flash { 0% { opacity: 0.5; } 100% { opacity: 0; } }
+
+@media (max-width: 820px) {
+  .ops-grid { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); }
+}
+@media (max-width: 540px) {
+  .ops-top-r span:first-child { display: none; }
+  .ops-grid { grid-template-columns: 1fr; grid-auto-rows: minmax(96px, 1fr); grid-template-rows: none; overflow-y: auto; }
+  .ops-panel.hide-sm { display: none; }
+}

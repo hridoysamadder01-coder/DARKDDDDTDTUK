@@ -8,7 +8,7 @@ import CRTOverlay from './components/background/CRTOverlay'
 import ClickFX from './components/fx/ClickFX'
 import ThreatOverlay from './components/fx/ThreatOverlay'
 import SoundToggle from './components/ui/SoundToggle'
-import BootSequence from './components/stages/BootSequence'
+import OpsBoot from './components/stages/OpsBoot'
 import OperatorScan from './components/stages/OperatorScan'
 import WelcomeHail from './components/stages/WelcomeHail'
 import Terminal from './components/stages/Terminal'
@@ -26,7 +26,7 @@ const fade = {
 }
 
 export default function App() {
-  const [stage, setStage] = useState<Stage>('boot')
+  const [stage, setStage] = useState<Stage>('opsBoot')
   const [engine, setEngine] = useState<Engine>(targetEngine)
   const [coin, setCoin] = useState<CryptoAsset | null>(null)
   const [welcomed, setWelcomed] = useState(false)
@@ -34,7 +34,10 @@ export default function App() {
   // Pause the heavy background canvases during full-screen cinematic stages
   // that already carry their own motion (keeps mobile framerate healthy).
   const heavyBgPaused =
-    stage === 'accessChain' || stage === 'final' || stage === 'codestream'
+    stage === 'opsBoot' ||
+    stage === 'accessChain' ||
+    stage === 'final' ||
+    stage === 'codestream'
 
   const goTerminal = useCallback(() => setStage('terminal'), [])
   const goCamera = useCallback(() => {
@@ -65,19 +68,19 @@ export default function App() {
       <ClickFX />
       <ThreatOverlay active={threatActive} />
 
-      {/* Persistent chrome (the code-stream screen has its own top bar) */}
-      {stage !== 'codestream' && <SoundToggle />}
-      {(stage === 'boot' || stage === 'cameraVerify') && (
-        <button className="skip-btn" onClick={goTerminal}>
+      {/* Persistent chrome (the ops-boot & code-stream screens own their top bars) */}
+      {stage !== 'codestream' && stage !== 'opsBoot' && <SoundToggle />}
+      {(stage === 'opsBoot' || stage === 'cameraVerify') && (
+        <button className="skip-btn" onClick={stage === 'opsBoot' ? goCamera : goTerminal}>
           SKIP ▸
         </button>
       )}
 
       <div className="stage-root">
         <AnimatePresence mode="wait">
-          {stage === 'boot' && (
-            <motion.div key="boot" {...fade}>
-              <BootSequence onDone={goCamera} />
+          {stage === 'opsBoot' && (
+            <motion.div key="opsboot" {...fade}>
+              <OpsBoot onDone={goCamera} />
             </motion.div>
           )}
 
