@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import gsap from 'gsap'
 import type { Engine } from '../../types'
 import { useSound } from '../../hooks/useSoundToggle'
-import { logFragments, renderFragment, pick } from '../../lib/random'
+import { logFragments, renderFragment, pick, hex, randInt } from '../../lib/random'
 import type { LogLine } from '../ui/TerminalLog'
 import TerminalLog from '../ui/TerminalLog'
 import ProgressBar from '../ui/ProgressBar'
@@ -14,6 +14,64 @@ interface Step {
   pct: number
   flash?: boolean
   black?: boolean
+}
+
+/* live decrypt hex stream (left rail) */
+function DecryptStream() {
+  const [rows, setRows] = useState<string[]>([])
+  useEffect(() => {
+    const gen = () =>
+      Array.from({ length: 9 }).map(
+        () => `0x${hex(6)}  ` + Array.from({ length: 6 }).map(() => hex(2)).join(' '),
+      )
+    setRows(gen())
+    const iv = window.setInterval(() => setRows(gen()), 120)
+    return () => window.clearInterval(iv)
+  }, [])
+  return (
+    <div className="chain-side panel framed hide-sm">
+      <div className="chain-side-h"><span className="ops-h-dot" /> DECRYPT STREAM</div>
+      <div className="chain-hex">
+        {rows.map((r, i) => (
+          <div key={i}>{r}</div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* signature-match telemetry (right rail), scales with progress */
+const SIG = ['MATCH', 'ENTROPY', 'CIPHER', 'DEPTH']
+const SIGNODES = ['NODE-7X', 'VAULT-11', 'OMEGA-4', 'BLACKNODE-21', 'GHOST-3']
+function SignaturePanel({ pct }: { pct: number }) {
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const iv = window.setInterval(() => setTick((t) => t + 1), 300)
+    return () => window.clearInterval(iv)
+  }, [])
+  const vals = SIG.map((_, i) =>
+    Math.max(4, Math.min(99, Math.round(pct * (0.72 + i * 0.07) + randInt(-5, 5)))),
+  )
+  return (
+    <div className="chain-side panel framed hide-sm">
+      <div className="chain-side-h"><span className="ops-h-dot" /> SIGNATURE MATCH</div>
+      <div className="chain-sig">
+        {SIG.map((s, i) => (
+          <div className="chain-sigrow" key={s}>
+            <span>{s}</span>
+            <span className="chain-sigbar"><span style={{ width: `${vals[i]}%` }} /></span>
+            <b>{vals[i]}%</b>
+          </div>
+        ))}
+      </div>
+      <div className="chain-nodes">
+        {SIGNODES.slice(0, 3 + (pct > 60 ? 2 : 0)).map((n) => (
+          <div key={n}>verify {n} :: <span className="ok">ok</span></div>
+        ))}
+        <div>seal 0x{hex(6)}</div>
+      </div>
+    </div>
+  )
 }
 
 // Exact spec sequence.
@@ -142,22 +200,33 @@ export default function AccessChain({ engine, onDone }: { engine: Engine; onDone
                 className="chain-status faded"
                 style={{ fontSize: 11, letterSpacing: '0.24em', color: 'var(--text-dim)' }}
               >
-                {chainLabel} // ACCESS CHAIN
+                {chainLabel} // ACCESS CHAIN · DECRYPTING
               </div>
-              <div className="pct">{Math.round(pct)}%</div>
-              <div style={{ maxWidth: 460, margin: '0 auto 10px' }}>
-                <ProgressBar value={pct} danger={flash} />
+
+              <div className="chain-grid">
+                <DecryptStream />
+
+                <div className="chain-core">
+                  <div className="pct">{Math.round(pct)}%</div>
+                  <div style={{ maxWidth: 380, margin: '0 auto 10px', width: '100%' }}>
+                    <ProgressBar value={pct} danger={flash} />
+                  </div>
+                  <motion.div
+                    className="headline"
+                    key={headline}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {headline}
+                    <span className="cursor" />
+                  </motion.div>
+                  <div className="chain-coresub">SIG 0x{hex(8)} · NODE {pick(SIGNODES)}</div>
+                </div>
+
+                <SignaturePanel pct={pct} />
               </div>
-              <motion.div
-                className="headline"
-                key={headline}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {headline}
-                <span className="cursor" />
-              </motion.div>
+
               <div className="log-wrap panel framed" ref={logRef}>
                 <TerminalLog lines={logs} />
               </div>

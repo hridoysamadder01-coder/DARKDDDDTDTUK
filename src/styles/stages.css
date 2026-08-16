@@ -1523,3 +1523,45 @@
   70% { transform: translateX(-2px); }
   100% { opacity: 0; transform: translateX(0); }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   ACCESS CHAIN · war-room decrypt console
+   ───────────────────────────────────────────────────────────── */
+.chain .inner { max-width: 900px; width: 100%; }
+.chain-grid {
+  display: grid; grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 12px; align-items: stretch; margin: 12px 0 12px;
+}
+.chain-side {
+  display: flex; flex-direction: column; min-height: 168px; overflow: hidden;
+  text-align: left; padding: 0;
+}
+.chain-side-h {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 10px; border-bottom: 1px solid var(--line);
+  font-size: 9.5px; letter-spacing: 0.2em; color: var(--text-dim);
+  background: rgba(0, 0, 0, 0.25);
+}
+.chain-hex {
+  flex: 1; padding: 8px 10px; font-size: 10px; line-height: 1.55;
+  color: var(--green-dim); overflow: hidden; white-space: nowrap;
+}
+.chain-core {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.chain-coresub {
+  margin-top: 10px; font-size: 10px; letter-spacing: 0.14em; color: var(--text-dim);
+}
+.chain-sig { padding: 12px 10px; display: flex; flex-direction: column; gap: 9px; }
+.chain-sigrow { display: flex; align-items: center; gap: 8px; font-size: 10px; }
+.chain-sigrow > span:first-child { width: 58px; color: var(--text-dim); letter-spacing: 0.08em; flex: none; }
+.chain-sigbar { flex: 1; height: 5px; background: rgba(69, 207, 146, 0.1); overflow: hidden; }
+.chain-sigbar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--green-deep), var(--green)); box-shadow: 0 0 8px var(--green-glow); transition: width 0.3s ease; }
+.chain-sigrow b { width: 32px; text-align: right; color: var(--text); flex: none; }
+.chain-nodes { padding: 2px 10px 10px; font-size: 9.5px; color: var(--text-dim); line-height: 1.7; }
+.chain-nodes .ok { color: var(--green); }
+
+@media (max-width: 760px) {
+  .chain-grid { grid-template-columns: 1fr; }
+  .chain-side.hide-sm { display: none; }
+}
