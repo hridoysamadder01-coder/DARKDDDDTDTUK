@@ -9,17 +9,51 @@ import { hex, pick, randInt } from '../../lib/random'
 const VW = 1000
 const VH = 460
 
-// continents approximated as ellipses in normalized [0..1] space
-const LAND: Array<[number, number, number, number]> = [
-  [0.18, 0.30, 0.09, 0.10], [0.24, 0.23, 0.06, 0.06], [0.27, 0.40, 0.05, 0.08], // N. America
-  [0.30, 0.62, 0.05, 0.10], [0.33, 0.76, 0.035, 0.07], // S. America
-  [0.49, 0.26, 0.05, 0.05], // Europe
-  [0.52, 0.52, 0.07, 0.09], [0.55, 0.63, 0.05, 0.07], // Africa
-  [0.66, 0.28, 0.15, 0.11], [0.80, 0.33, 0.06, 0.06], // Asia
-  [0.66, 0.44, 0.04, 0.05], // India
-  [0.77, 0.52, 0.05, 0.04], // SE Asia
-  [0.84, 0.70, 0.06, 0.05], // Australia
+// continents as normalized [0..1] polygons (x = lon, y = lat, top = north)
+const POLYS: number[][][] = [
+  // North America
+  [[0.02, 0.22], [0.09, 0.14], [0.16, 0.12], [0.21, 0.15], [0.25, 0.12], [0.31, 0.16],
+   [0.29, 0.21], [0.31, 0.26], [0.26, 0.30], [0.245, 0.35], [0.205, 0.44], [0.18, 0.46],
+   [0.175, 0.40], [0.145, 0.37], [0.115, 0.35], [0.10, 0.30], [0.075, 0.27], [0.045, 0.25]],
+  // Greenland
+  [[0.30, 0.06], [0.35, 0.05], [0.365, 0.11], [0.335, 0.15], [0.305, 0.11]],
+  // South America
+  [[0.205, 0.47], [0.25, 0.455], [0.29, 0.49], [0.325, 0.55], [0.34, 0.62], [0.325, 0.66],
+   [0.30, 0.71], [0.275, 0.78], [0.255, 0.82], [0.24, 0.79], [0.245, 0.70], [0.23, 0.62],
+   [0.215, 0.55]],
+  // Africa
+  [[0.43, 0.33], [0.49, 0.32], [0.55, 0.34], [0.585, 0.40], [0.57, 0.47], [0.55, 0.52],
+   [0.525, 0.60], [0.495, 0.65], [0.465, 0.62], [0.45, 0.54], [0.43, 0.47], [0.415, 0.40]],
+  // Europe + Asia + Russia
+  [[0.42, 0.30], [0.45, 0.24], [0.49, 0.225], [0.545, 0.195], [0.61, 0.175], [0.70, 0.165],
+   [0.80, 0.175], [0.885, 0.215], [0.93, 0.25], [0.905, 0.295], [0.86, 0.325], [0.80, 0.335],
+   [0.74, 0.35], [0.705, 0.395], [0.675, 0.40], [0.635, 0.42], [0.60, 0.42], [0.565, 0.395],
+   [0.545, 0.335], [0.50, 0.305], [0.455, 0.305]],
+  // India
+  [[0.615, 0.40], [0.665, 0.40], [0.69, 0.44], [0.665, 0.50], [0.64, 0.47], [0.625, 0.44]],
+  // SE Asia / Indonesia
+  [[0.70, 0.47], [0.76, 0.485], [0.805, 0.515], [0.83, 0.555], [0.80, 0.575], [0.755, 0.555],
+   [0.715, 0.52]],
+  // Australia
+  [[0.795, 0.66], [0.86, 0.645], [0.915, 0.685], [0.905, 0.75], [0.855, 0.775], [0.805, 0.745],
+   [0.785, 0.70]],
 ]
+// small islands / peninsulas as ellipses [cx, cy, rx, ry]
+const ISLES: Array<[number, number, number, number]> = [
+  [0.452, 0.245, 0.016, 0.024], // British Isles
+  [0.888, 0.335, 0.016, 0.05], // Japan
+  [0.93, 0.80, 0.014, 0.03], // New Zealand
+  [0.60, 0.47, 0.02, 0.02], // Arabian tip
+]
+
+function inPoly(x: number, y: number, poly: number[][]): boolean {
+  let c = false
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1]
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c
+  }
+  return c
+}
 
 const CITIES: Array<{ n: string; x: number; y: number }> = [
   { n: 'LA', x: 0.12, y: 0.36 },
@@ -42,13 +76,18 @@ export default function WorldMap({ cls = '' }: { cls?: string }) {
   // static land dots (deterministic — computed once)
   const dots = useMemo(() => {
     const out: Array<[number, number]> = []
-    for (let ny = 0.06; ny < 0.98; ny += 0.028) {
-      for (let nx = 0.02; nx < 0.99; nx += 0.016) {
+    for (let ny = 0.04; ny < 0.98; ny += 0.024) {
+      for (let nx = 0.01; nx < 0.99; nx += 0.0135) {
         let inside = false
-        for (const [cx, cy, rx, ry] of LAND) {
-          const dx = (nx - cx) / rx
-          const dy = (ny - cy) / ry
-          if (dx * dx + dy * dy <= 1) { inside = true; break }
+        for (const poly of POLYS) {
+          if (inPoly(nx, ny, poly)) { inside = true; break }
+        }
+        if (!inside) {
+          for (const [cx, cy, rx, ry] of ISLES) {
+            const dx = (nx - cx) / rx
+            const dy = (ny - cy) / ry
+            if (dx * dx + dy * dy <= 1) { inside = true; break }
+          }
         }
         if (inside) out.push([nx * VW, ny * VH])
       }
