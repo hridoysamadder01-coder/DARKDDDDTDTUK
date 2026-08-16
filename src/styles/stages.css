@@ -827,12 +827,20 @@
 .lf-line.warn { color: var(--amber); }
 .lf-line.err { color: var(--red); }
 .lf-prompt {
+  position: relative; cursor: text;
   display: flex; align-items: center; gap: 8px;
   padding: 8px 12px; border-top: 1px solid var(--line);
   font-size: 12px; background: rgba(0, 0, 0, 0.25);
 }
 .lf-ps { color: var(--green); flex: none; }
-.lf-cmd { color: var(--text); white-space: pre; }
+.lf-cmd { color: var(--green); white-space: pre; text-shadow: 0 0 8px var(--green-glow); }
+/* real input overlays the prompt to capture keys + raise the mobile keyboard */
+.lf-input {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  padding: 0 12px; margin: 0; border: 0; outline: none;
+  background: transparent; color: transparent; caret-color: transparent;
+  font: inherit; letter-spacing: inherit;
+}
 
 /* ─────────────────────────────────────────────────────────────
    OPERATOR SCAN · camera biometric gate
