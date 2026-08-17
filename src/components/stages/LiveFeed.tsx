@@ -66,9 +66,10 @@ export default function LiveFeed() {
       case 'help':
         return [
           ['commands ::', 'ok'],
-          ['  help   ls   whoami   status   clear', 'dim'],
-          ['  scan   trace <t>   ping <h>   connect <node>', 'dim'],
-          ['  decrypt <file>   exploit <target>', 'dim'],
+          ['  help  ls  whoami  status  sysinfo  clear', 'dim'],
+          ['  scan  nmap [host]  trace <t>  ping <h>', 'dim'],
+          ['  connect <node>  decrypt <file>  cat <file>', 'dim'],
+          ['  crack <hash>  download <file>  sudo  exploit <t>', 'dim'],
         ]
       case 'ls':
         return [
@@ -136,6 +137,64 @@ export default function LiveFeed() {
           ['escalating privileges ...', 'dim'],
           ['access :: GRANTED', 'ok'],
         ]
+      case 'nmap': {
+        const host = arg || '10.7.0.0/16'
+        const out: Out[] = [[`nmap -sS -T4 ${host}`, 'dim'], ['starting scan ...', 'dim']]
+        for (const port of [22, 80, 443, 8443, 9001]) {
+          out.push([`  ${port}/tcp  ${pick(['open', 'open', 'filtered', 'open'])}  ${pick(['ssh', 'http', 'https', 'vault', 'ghost'])}`, 'dim'])
+        }
+        out.push([`${randInt(3, 9)} hosts up · scan done`, 'ok'])
+        return out
+      }
+      case 'sudo':
+        return [
+          ['[sudo] password for operator:', 'dim'],
+          ['operator is not in the sudoers file.', 'err'],
+          [`override token 0x${hex(6)} :: accepted`, 'warn'],
+          ['privileges escalated → root', 'ok'],
+        ]
+      case 'cat': {
+        if (!arg) return need('cat <file>')
+        if (/vault|obsidian|key/i.test(arg)) {
+          return [
+            [`cat: ${arg} :: SEALED`, 'warn'],
+            ['████ ████ ████ ████ :: OMEGA-encrypted', 'dim'],
+            ['! clearance required', 'err'],
+          ]
+        }
+        return [
+          [`# ${arg}`, 'dim'],
+          [`0x${hex(8)} ${hex(8)} ${hex(8)}`, 'dim'],
+          [`0x${hex(8)} ${hex(8)} ${hex(8)}`, 'dim'],
+          ['EOF', 'dim'],
+        ]
+      }
+      case 'sysinfo':
+        return [
+          ['core-terminal-7x · kernel 6.6.0-core7x', 'dim'],
+          ['AMD Ghost-Core 16x @ 4.70GHz · 64GB', 'dim'],
+          [`net GHOSTCHAIN · tun0 OMEGA-4 · ping ${randInt(12, 40)}ms`, 'dim'],
+        ]
+      case 'crack': {
+        if (!arg) return need('crack <hash>')
+        const key = hex(8)
+        const out: Out[] = [[`bruteforce ${arg} ...`, 'dim'], ['dictionary + mask attack', 'dim']]
+        for (let i = 2; i <= 8; i += 2) {
+          out.push([`key :: ${key.slice(0, i)}${'·'.repeat(8 - i)}`, i < 8 ? 'warn' : 'ok'])
+        }
+        out.push([`KEY RECOVERED :: 0x${key}`, 'ok'])
+        return out
+      }
+      case 'download': {
+        if (!arg) return need('download <file>')
+        const out: Out[] = [[`downloading ${arg} ...`, 'dim']]
+        for (const pv of [12, 34, 58, 79, 96, 100]) {
+          const f = Math.round(pv / 10)
+          out.push([`[${'█'.repeat(f)}${'·'.repeat(10 - f)}] ${pv}%  ${randInt(40, 180)} MB/s`, pv < 100 ? 'dim' : 'ok'])
+        }
+        out.push([`complete :: ${arg} · ${randInt(1, 9)}.${randInt(0, 9)} GB`, 'ok'])
+        return out
+      }
       case 'clear':
         return [['__CLEAR__', 'dim']]
       default:

@@ -40,10 +40,26 @@ const LINES: Array<[string, Kind, ('OK' | 'WARN')?]> = [
 
 export default function KernelBoot({ onDone }: { onDone: () => void }) {
   const { play } = useSound()
+  const [phase, setPhase] = useState<'post' | 'kernel'>('post')
+  const [mem, setMem] = useState(0)
   const [rows, setRows] = useState<Row[]>([])
   const [online, setOnline] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
   const doneRef = useRef(false)
+
+  // BIOS/POST cold-start: count memory, then hand off to the kernel.
+  useEffect(() => {
+    play('beep')
+    let m = 0
+    const memIv = window.setInterval(() => {
+      m = Math.min(65536, m + 4096 + Math.floor(Math.random() * 4096))
+      setMem(m)
+      if (m >= 65536) window.clearInterval(memIv)
+    }, 55)
+    const to = window.setTimeout(() => setPhase('kernel'), 1650)
+    return () => { window.clearInterval(memIv); window.clearTimeout(to) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const built = useMemo<Row[]>(() => {
     let t = 0
@@ -55,6 +71,7 @@ export default function KernelBoot({ onDone }: { onDone: () => void }) {
   }, [])
 
   useEffect(() => {
+    if (phase !== 'kernel') return
     let i = 0
     const iv = window.setInterval(() => {
       if (i < built.length) {
@@ -71,12 +88,28 @@ export default function KernelBoot({ onDone }: { onDone: () => void }) {
     }, 52)
     return () => window.clearInterval(iv)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [phase])
 
   useEffect(() => {
     const el = bodyRef.current
     if (el) el.scrollTop = el.scrollHeight
   }, [rows])
+
+  if (phase === 'post') {
+    return (
+      <div className="kboot">
+        <div className="kb-post">
+          <div className="kb-post-h">GHOSTBIOS v7.4 · (C) CORE SYSTEMS</div>
+          <div>Detecting Memory ... <span className="kb-ok">{mem.toLocaleString()} MB{mem >= 65536 ? '  OK' : ''}</span></div>
+          <div>Detecting Storage ... /dev/vault11  <span className="kb-warn">SEALED</span></div>
+          <div>Detecting Network ... GHOSTCHAIN  <span className="kb-ok">LINKED</span></div>
+          <div>CPU: AMD Ghost-Core 16x  4.70GHz · 16 threads</div>
+          <div className="kb-dim">Press DEL to enter setup ...</div>
+          <div>Booting from /dev/vault11 ...<span className="cursor" /></div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="kboot">

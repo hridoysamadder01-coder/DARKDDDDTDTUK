@@ -1641,3 +1641,8 @@
   letter-spacing: 0.14em; color: var(--green); text-shadow: 0 0 18px var(--green-glow);
 }
 @media (max-width: 600px) { .kboot { font-size: 10.5px; padding: 16px 14px; } }
+
+/* BIOS/POST cold-start screen (kernel boot phase 1) */
+.kb-post { display: flex; flex-direction: column; gap: 5px; }
+.kb-post-h { color: var(--green); margin-bottom: 12px; letter-spacing: 0.06em; }
+.kb-dim { opacity: 0.6; }
